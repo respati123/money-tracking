@@ -1,0 +1,23 @@
+version: '3.5'
+
+services:
+  db:
+    container_name: db_postgresql
+    image: postgres:alpine
+    ports:
+      - '5434:5432'
+    environment:
+      - POSTGRES_USER: money 
+      - POSTGRES_PASSWORD: money 
+      - POSTGRES_DB: money_tracking
+    networks:
+      - db_postgresql
+    volumes:
+      - db_postgresql:/var/lib/postgresql/data
+
+volumes:
+  db_postgresql:
+
+networks:
+  db_postgresql:
+    driver: bridge
