@@ -2,8 +2,11 @@ package configs
 
 import (
 	"github.com/gin-gonic/gin"
+	docs "github.com/respati123/money-tracking/docs"
 	"github.com/respati123/money-tracking/internal/handlers"
 	"github.com/respati123/money-tracking/util"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 	"gorm.io/gorm"
 )
 
@@ -14,6 +17,7 @@ type RunServerParams struct {
 func RunServer(env util.Config, db gorm.DB) {
 
 	router := gin.Default()
+	docs.SwaggerInfo.BasePath = "/api/v1"
 
 	router.GET("/", func(ctx *gin.Context) {
 		ctx.JSON(200, gin.H{
@@ -26,6 +30,8 @@ func RunServer(env util.Config, db gorm.DB) {
 		authRouter := version1.Group("/auth")
 		handlers.NewAuthHandler(authRouter, db, env)
 	}
+
+	router.GET("swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	router.Run(":" + env.PORT_SERVER)
 	// create route here;

@@ -16,11 +16,11 @@ run:
 
 run-dev:
 	cp env/.env.development app.env
-	go run cmd/main.go
+	go run cmd/money/main.go
 
 run-staging:
 	cp env/.env.staging app.env
-	go run cmd/main.go
+	go run cmd/money/main.go
 
 up-dev:
 	cp env/.env.development app.env
@@ -30,6 +30,7 @@ down-dev:
 	$(DOCKERCOMPOSE) -f $(DOCKER_COMPOSE_FILE_DEVELOPMENT) down
 
 up-staging:
+	cp env/.env.development app.env
 	$(DOCKERCOMPOSE) -f $(DOCKER_COMPOSE_FILE) up --build -d
 
 down-staging:

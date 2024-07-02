@@ -1,0 +1,38 @@
+basePath: /api/v1
+definitions:
+  handlers.User:
+    properties:
+      id:
+        type: integer
+      name:
+        type: string
+    type: object
+host: localhost:8080
+info:
+  contact:
+    email: support@swagger.io
+    name: API Support
+  description: This is a sample server.
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  termsOfService: http://swagger.io/terms/
+  title: My API
+  version: "1.0"
+paths:
+  /create-user:
+    get:
+      consumes:
+      - application/json
+      description: Create a new user with input payload
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handlers.User'
+      summary: Create a new user
+      tags:
+      - hello
+swagger: "2.0"
