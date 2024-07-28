@@ -1,38 +1,36 @@
 package main
 
 import (
-	"fmt"
-	"log"
-
 	"github.com/respati123/money-tracking/configs"
+	"github.com/respati123/money-tracking/docs"
 	_ "github.com/respati123/money-tracking/docs"
-	"github.com/respati123/money-tracking/internal/database"
 )
 
 // @title My API
 // @version 1.0
-// @description This is a sample server.
+// @description Money Tracking Service.
 // @termsOfService http://swagger.io/terms/
 // @contact.name API Support
 // @contact.email support@swagger.io
-// @license.name Apache 2.0
-// @license.url http://www.apache.org/licenses/LICENSE-2.0.html
 // @host localhost:8080
 // @BasePath /api/v1
 func main() {
 
-	config, err := configs.InitConfig(".")
+	config, viper := configs.InitConfig()
+	log := configs.NewLogger(viper)
+	db := configs.Database(config, log)
+	app := configs.NewGin(viper)
 
-	if err != nil {
-		defer log.Fatal("env not found", err.Error())
-	}
+	// setup swagger
+	docs.SwaggerInfo.Host = "localhost:8081"
+	docs.SwaggerInfo.Schemes = []string{"http", "https"}
 
-	dbReal, dbTest, err := configs.Database(config)
-	database.NewMigration(dbReal, dbTest)
-
-	if err != nil {
-		defer fmt.Printf("error database %s", err.Error())
-	}
-
-	configs.RunServer(config, *dbReal)
+	configs.Bootstrap(&configs.BootstrapConfig{
+		DB:     db,
+		Log:    log,
+		Viper:  viper,
+		App:    app,
+		Config: config,
+	})
+	app.Run(":" + viper.GetString("PORT_SERVER"))
 }

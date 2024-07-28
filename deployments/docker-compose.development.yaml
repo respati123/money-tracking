@@ -11,20 +11,19 @@ services:
       - db
     networks:
       - db_postgresql
-      - db_postgresql_test
-    restart: on-failure
+    restart: always
     env_file:
       - ../app.env
     volumes:
       - ../:/app
     ports:
-      - "8080:8080"
+      - "8081:8081"
   db:
     container_name: db_postgresql
     image: postgres:16.3
     ports:
       - 5434:5432
-    restart: on-failure
+    restart: always
     env_file:
       - ../app.env
     networks:
@@ -37,7 +36,5 @@ services:
 volumes:
   db_postgresql:
 networks:
-  db_postgresql_test:
-    driver: bridge
   db_postgresql:
     driver: bridge

@@ -1,4 +1,4 @@
-DOCKERCOMPOSE=docker-compose
+DOCKERCOMPOSE=docker compose
 DOCKER_COMPOSE_FILE_DEVELOPMENT=deployments/docker-compose.development.yaml
 DOCKER_COMPOSE_FILE=deployments/docker-compose.yaml
 
@@ -13,7 +13,6 @@ export $(shell sed 's/=.*//' .env)
 run:
 	@echo DB_HOST is $(DB_HOST)
 	@echo DB_PORT is $(DB_PORT)
-
 run-dev:
 	cp env/.env.development app.env
 	go run cmd/money/main.go

@@ -3,20 +3,19 @@ package configs
 import (
 	"fmt"
 
-	"github.com/respati123/money-tracking/util"
+	"github.com/respati123/money-tracking/internal/util"
 	"github.com/spf13/viper"
 )
 
-func InitConfig(path string) (config util.Config, errConfig error) {
-	cfg := viper.New()
+func InitConfig() (config util.Config, cfg *viper.Viper) {
+	cfg = viper.New()
 	cfg.SetConfigType("env")
-	cfg.AddConfigPath(path)
+	cfg.AddConfigPath(".")
 	cfg.SetConfigName("app")
-
 	err := cfg.ReadInConfig()
 
 	if err != nil {
-		fmt.Printf("error config: %s", err.Error())
+		panic(fmt.Errorf("Fatal error config file: %w \n", err))
 	}
 
 	errMarshal := cfg.Unmarshal(&config)
@@ -24,6 +23,6 @@ func InitConfig(path string) (config util.Config, errConfig error) {
 	if errMarshal != nil {
 		fmt.Print(errMarshal.Error())
 	}
-	return config, nil
+	return config, cfg
 
 }
