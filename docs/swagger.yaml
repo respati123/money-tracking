@@ -1,10 +1,44 @@
 basePath: /api/v1
 definitions:
-  handlers.User:
+  http.CreateUserRequest:
+    type: object
+  http.ErrorResponse:
+    type: object
+  http.UpdateUserRequest:
+    type: object
+  http.UserResponse:
+    type: object
+  model.LoginRequest:
     properties:
-      id:
-        type: integer
-      name:
+      email:
+        type: string
+      password:
+        type: string
+    type: object
+  model.LoginResponse:
+    properties:
+      expired_at:
+        type: string
+      refresh_token:
+        type: string
+      token:
+        type: string
+    type: object
+  model.RegisterRequest:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+      phone_number:
+        type: string
+    type: object
+  model.Response:
+    properties:
+      response_data: {}
+      response_error:
+        type: string
+      response_message:
         type: string
     type: object
 host: localhost:8080
@@ -12,27 +46,164 @@ info:
   contact:
     email: support@swagger.io
     name: API Support
-  description: This is a sample server.
-  license:
-    name: Apache 2.0
-    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  description: Money Tracking Service.
   termsOfService: http://swagger.io/terms/
   title: My API
   version: "1.0"
 paths:
-  /create-user:
-    get:
+  /auth/login:
+    post:
       consumes:
       - application/json
-      description: Create a new user with input payload
+      description: Login
+      parameters:
+      - description: Login Request
+        in: body
+        name: loginRequest
+        required: true
+        schema:
+          $ref: '#/definitions/model.LoginRequest'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/handlers.User'
-      summary: Create a new user
+            allOf:
+            - $ref: '#/definitions/model.Response'
+            - properties:
+                response_data:
+                  $ref: '#/definitions/model.LoginResponse'
+              type: object
+      summary: Login
       tags:
-      - hello
+      - auth
+  /auth/register:
+    post:
+      consumes:
+      - application/json
+      description: Register
+      parameters:
+      - description: Register Request
+        in: body
+        name: registerRequest
+        required: true
+        schema:
+          $ref: '#/definitions/model.RegisterRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/model.Response'
+            - properties:
+                response_data:
+                  type: string
+              type: object
+      summary: Register
+      tags:
+      - auth
+  /users:
+    post:
+      consumes:
+      - application/json
+      description: Creates a new user
+      parameters:
+      - description: User data
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/http.CreateUserRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/http.UserResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+      summary: Create a new user
+  /users/{id}:
+    delete:
+      description: Deletes a user by ID
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+      summary: Delete a user by ID
+    get:
+      description: Retrieves a user by ID
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/http.UserResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+      summary: Get a user by ID
+    put:
+      consumes:
+      - application/json
+      description: Updates an existing user
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: User data
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/http.UpdateUserRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/http.UserResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+      summary: Update an existing user
 swagger: "2.0"
