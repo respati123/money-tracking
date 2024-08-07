@@ -9,10 +9,9 @@ import (
 )
 
 type RouteConfig struct {
-	App            *gin.Engine
-	UserController http.UserController
-	AuthController http.AuthController
-	//
+	App               *gin.Engine
+	UserController    *http.UserController
+	AuthController    *http.AuthController
 	TraceIdMiddleware gin.HandlerFunc
 }
 
@@ -34,8 +33,5 @@ func (c *RouteConfig) SetupPublicRoute() {
 }
 
 func (c *RouteConfig) SetupPrivateRoute() {
-	c.App.GET("/api/v1/users/:user_code", c.UserController.GetUser)
-	c.App.POST("/api/v1/users", c.UserController.CreateUser)
-	c.App.PUT("/api/v1/users/:uuid", c.UserController.UpdateUser)
-	c.App.DELETE("/api/v1/users/:uuid", c.UserController.DeleteUser)
+	c.App.POST("/api/v1/users/list", c.UserController.GetListUser)
 }

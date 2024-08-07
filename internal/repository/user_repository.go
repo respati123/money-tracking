@@ -1,66 +1,43 @@
 package repository
 
 import (
-	"context"
-
+	"github.com/respati123/money-tracking/internal/configs/logger"
 	"github.com/respati123/money-tracking/internal/entity"
-	"github.com/sirupsen/logrus"
 	"gorm.io/gorm"
 )
 
-type UserRepository interface {
-	GetUserByID(ctx context.Context, id int) (*entity.User, error)
-	CreateUser(ctx context.Context, user *entity.User) (*entity.User, error)
-	UpdateUser(ctx context.Context, user *entity.User) (*entity.User, error)
-	DeleteUser(ctx context.Context, id int) error
-	GetUserIDByEmail(ctx context.Context, email string) (uint, error)
+type UserRepository struct {
+	Repository[entity.User]
+	log *logger.CustomLogger
 }
 
-type userRepository struct {
-	db  *gorm.DB
-	log *logrus.Logger
-}
-
-func (u *userRepository) GetUserIDByEmail(ctx context.Context, email string) (uint, error) {
-	var user entity.User
-	if err := u.db.WithContext(ctx).Where("email = ?", email).First(&user).Error; err != nil {
-		return 0, err
+func NewUserRepository(log *logger.CustomLogger) *UserRepository {
+	return &UserRepository{
+		log: log.Module("user-repository"),
 	}
-	return user.ID, nil
 }
 
-func (u *userRepository) CreateUser(ctx context.Context, user *entity.User) (*entity.User, error) {
-	err := u.db.Create(user).Error
-	if err != nil {
-		return nil, err
-	}
-	return user, nil
-}
-
-func (u *userRepository) DeleteUser(ctx context.Context, id int) error {
-	return u.db.Delete(&entity.User{}, id).Error
-}
-
-func (u *userRepository) GetUserByID(ctx context.Context, id int) (*entity.User, error) {
+func (a *UserRepository) FindByEmail(tx *gorm.DB, email string) (*entity.User, error) {
 	var user entity.User
-	err := u.db.First(&user, id).Error
+	err := tx.Take(&user, "email = ?", email).Error
 	if err != nil {
 		return nil, err
 	}
 	return &user, nil
 }
 
-func (u *userRepository) UpdateUser(ctx context.Context, user *entity.User) (*entity.User, error) {
-	err := u.db.Save(user).Error
-	if err != nil {
-		return nil, err
-	}
-	return user, nil
+func (r *UserRepository) FindByID(db *gorm.DB, result *entity.User, id string) (*entity.User, error) {
+	err := db.Where("uuid =?", id).First(&result).Error
+	return result, err
 }
 
-func NewUserRepository(db *gorm.DB, log *logrus.Logger) UserRepository {
-	return &userRepository{
-		db:  db,
-		log: log,
-	}
+func (r *UserRepository) FindByCode(db *gorm.DB, result *entity.User, id int) (*entity.User, error) {
+	err := db.Where("user_code =?", id).First(&result).Error
+	return result, err
+}
+
+func (r *UserRepository) CountByEmail(db *gorm.DB, email string) (int64, error) {
+	var total int64
+	err := db.Where("email = ?", email).Count(&total).Error
+	return total, err
 }

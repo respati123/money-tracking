@@ -14,5 +14,6 @@ RUN echo "ls -la"
 
 RUN go get github.com/githubnemo/CompileDaemon
 RUN go install github.com/githubnemo/CompileDaemon
+# RUN go install github.com/swaggo/swag/cmd/swag@latest
 
 ENTRYPOINT CompileDaemon -build="go build -o main cmd/money/main.go" -command="./main"

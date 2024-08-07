@@ -14,9 +14,6 @@ type Model struct {
 }
 
 type Base struct {
-	CreatedAt time.Time
-	UpdatedAt time.Time
-	DeletedAt gorm.DeletedAt `gorm:"index"`
 	CreatedBy string
 	UpdatedBy string
 	DeletedBy string

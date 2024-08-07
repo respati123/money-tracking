@@ -1,102 +1,105 @@
 package http
 
 import (
+	"net/http"
+
 	"github.com/gin-gonic/gin"
+	"github.com/respati123/money-tracking/internal/configs/logger"
+	"github.com/respati123/money-tracking/internal/model"
 	"github.com/respati123/money-tracking/internal/usecase"
-	"github.com/sirupsen/logrus"
-	"gorm.io/gorm"
+	"github.com/respati123/money-tracking/internal/util"
 )
 
-type UserController interface {
-	GetUser(c *gin.Context)
-	CreateUser(c *gin.Context)
-	UpdateUser(c *gin.Context)
-	DeleteUser(c *gin.Context)
+type UserController struct {
+	userUseCase *usecase.UserUseCase
+	log         *logger.CustomLogger
 }
 
-type userController struct {
-	userUseCase usecase.UserUseCase
-	db          *gorm.DB
-	log         *logrus.Logger
-}
-
-func NewUserController(userUseCase usecase.UserUseCase, db *gorm.DB, log *logrus.Logger) UserController {
-	return &userController{
+func NewUserController(userUseCase *usecase.UserUseCase, log *logger.CustomLogger) *UserController {
+	return &UserController{
 		userUseCase: userUseCase,
-		db:          db,
-		log:         log,
+		log:         log.Module("user-controller"),
 	}
 }
 
-// GetUser retrieves a user by ID.
-// @Summary Get a user by ID
-// @Description Retrieves a user by ID
+// GetListUser retrieves a list of users.
+// @Summary Get a list of users
+// @Description Retrieves a list of users
 // @Produce json
-// @Param id path int true "User ID"
-// @Success 200 {object} UserResponse
-// @Failure 400 {object} ErrorResponse
-// @Failure 404 {object} ErrorResponse
-// @Router /users/{id} [get]
-func (uc *userController) GetUser(c *gin.Context) {
-	// Implement your logic here
+// @Tags Users
+// @Param body body model.PaginationRequest false "Body Pagination"
+// @Success 200 {object} model.Response{response_data=model.PaginationResponse{data=model.UserResponse}} "success get list user"
+// @Router /users/list [post]
+// @Security ApiKeyAuth
+func (a *UserController) GetListUser(ctx *gin.Context) {
+	var (
+		request model.PaginationRequest
+	)
+
+	if err := ctx.ShouldBindJSON(&request); err != nil {
+		a.log.ErrorWithFields(ctx, "error binding request ", err)
+		util.SendErrorResponse(ctx, http.StatusBadRequest, "error binding request", err)
+		return
+	}
+	response, err := a.userUseCase.GetListUser(ctx, request)
+
+	if err != nil {
+		a.log.ErrorWithFields(ctx, "error get list user ", err)
+		util.SendErrorResponse(ctx, http.StatusInternalServerError, "error get list user", err)
+		return
+	}
+
+	util.SendSuccessResponse(ctx, http.StatusOK, "success get list user", response)
+
 }
 
-// CreateUser creates a new user.
+// CreateUser creates a new user
 // @Summary Create a new user
-// @Description Creates a new user
-// @Accept json
+// @Description Create a new user
 // @Produce json
-// @Param user body CreateUserRequest true "User data"
-// @Success 201 {object} UserResponse
-// @Failure 400 {object} ErrorResponse
-// @Router /users [post]
-func (uc *userController) CreateUser(c *gin.Context) {
-	// Implement your logic here
+// @Tags Users
+// @Param body body model.UserCreateRequest true "Body User Create"
+// @Success 200 {object} model.Response{response_data=string} "success create user"
+// @Router /users/create [post]
+// @Security ApiKeyAuth
+func (a *UserController) CreateUser(ctx *gin.Context) {
+	var (
+		request model.UserCreateRequest
+	)
+
+	if err := ctx.ShouldBindJSON(&request); err != nil {
+		a.log.ErrorWithFields(ctx, "error binding request ", err)
+		util.SendErrorResponse(ctx, http.StatusBadRequest, "error binding request", err)
+		return
+	}
+
+	err := a.userUseCase.CreateUser(ctx, request)
+
+	if err != nil {
+		a.log.ErrorWithFields(ctx, "error create user ", err)
+		util.SendErrorResponse(ctx, http.StatusInternalServerError, "internal server error", err)
+		return
+	}
+	util.SendSuccessResponse(ctx, http.StatusOK, "success create user", nil)
 }
 
-// UpdateUser updates an existing user.
-// @Summary Update an existing user
-// @Description Updates an existing user
-// @Accept json
+// Detele user
+// @Summary Delete user
+// @Description Delete a new user
 // @Produce json
-// @Param id path int true "User ID"
-// @Param user body UpdateUserRequest true "User data"
-// @Success 200 {object} UserResponse
-// @Failure 400 {object} ErrorResponse
-// @Failure 404 {object} ErrorResponse
-// @Router /users/{id} [put]
-func (uc *userController) UpdateUser(c *gin.Context) {
-	// Implement your logic here
-}
+// @Tags Users
+// @Param uuid path string true  "uuid user"
+// @Success 200 {object} model.Response{response_data=string} "success delete user"
+// @Router /users/delete/{uuid} [delete]
+// @Security ApiKeyAuth
+func (a *UserController) Delete(ctx *gin.Context) {
+	uuid := ctx.Param("uuid")
+	err := a.userUseCase.DeleteUser(ctx, uuid)
+	if err != nil {
+		a.log.ErrorWithFields(ctx, "error delete user", err)
+		util.SendErrorResponse(ctx, http.StatusInternalServerError, "internal server error", err)
+		return
+	}
 
-// DeleteUser deletes a user by ID.
-// @Summary Delete a user by ID
-// @Description Deletes a user by ID
-// @Param id path int true "User ID"
-// @Success 204 "No Content"
-// @Failure 400 {object} ErrorResponse
-// @Failure 404 {object} ErrorResponse
-// @Router /users/{id} [delete]
-func (uc *userController) DeleteUser(c *gin.Context) {
-	// Implement your logic here
-}
-
-// UserResponse represents the response structure for user operations.
-type UserResponse struct {
-	// Define your response fields here
-}
-
-// CreateUserRequest represents the request structure for creating a user.
-type CreateUserRequest struct {
-	// Define your request fields here
-}
-
-// UpdateUserRequest represents the request structure for updating a user.
-type UpdateUserRequest struct {
-	// Define your request fields here
-}
-
-// ErrorResponse represents the error response structure.
-type ErrorResponse struct {
-	// Define your error response fields here
+	util.SendSuccessResponse(ctx, http.StatusOK, "success delete user", nil)
 }

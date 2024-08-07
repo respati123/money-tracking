@@ -1,90 +1,65 @@
 package usecase
 
 import (
-	"context"
-
+	"github.com/gin-gonic/gin"
+	"github.com/respati123/money-tracking/internal/configs/logger"
 	"github.com/respati123/money-tracking/internal/constants"
 	"github.com/respati123/money-tracking/internal/entity"
 	"github.com/respati123/money-tracking/internal/model"
 	"github.com/respati123/money-tracking/internal/repository"
 	"github.com/respati123/money-tracking/internal/util"
-	"github.com/sirupsen/logrus"
+	"gorm.io/gorm"
 )
 
-type AuthUsecase interface {
-	Login(ctx context.Context, request model.LoginRequest) (model.LoginResponse, error)
-	Register(ctx context.Context, request model.RegisterRequest) error
-}
-
-type authUsecase struct {
+type AuthUsecase struct {
+	db       *gorm.DB
+	log      *logger.CustomLogger
 	config   util.Config
-	log      *logrus.Logger
-	authRepo repository.AuthRepository
-	userRepo repository.UserRepository
+	authRepo *repository.AuthRepository
+	userRepo *repository.UserRepository
 }
 
-func (a *authUsecase) Login(ctx context.Context, request model.LoginRequest) (model.LoginResponse, error) {
-
-	user, err := a.authRepo.Login(ctx, request)
+func (a *AuthUsecase) Login(ctx *gin.Context, request model.LoginRequest) (model.LoginResponse, error) {
+	tx := a.db.WithContext(ctx).Begin()
+	defer tx.Rollback()
+	user, err := a.authRepo.Login(tx, request)
 	if err != nil {
 		if err == constants.ErrUserNotFound {
-			a.log.WithFields(logrus.Fields{
-				"trace_id": ctx.Value("trace_id"),
-				"module":   "auth_usecase",
-				"method":   "Login",
-			}).Error("password or email invalid :", err)
+			a.log.ErrorWithFields(ctx, "error user not found ", err)
 			return model.LoginResponse{}, err
 		}
+		a.log.ErrorWithFields(ctx, "error user not found ", err)
 		return model.LoginResponse{}, err
 	}
-
 	isValid := util.CheckPasswordHash(request.Password, user.Password)
-
 	if !isValid {
-		a.log.WithFields(logrus.Fields{
-			"trace_id": ctx.Value("trace_id"),
-			"module":   "auth_usecase",
-			"method":   "Login",
-		}).Error("password or email invalid :", err)
+		a.log.ErrorWithFields(ctx, "error check hashing password ", nil)
 		return model.LoginResponse{}, err
 	}
-
 	jwtToken, expiredAt, err := util.GenerateJwtToken(util.JWTParams{
 		Payload:    user.UUID,
 		SecretKey:  a.config.SECRET_KEY_JWT,
 		ExpireTime: a.config.JWT_EXPIRE_TIME,
 	})
-
 	if err != nil {
-		a.log.WithFields(logrus.Fields{
-			"trace_id": ctx.Value("trace_id"),
-			"module":   "auth_usecase",
-			"method":   "Login",
-		}).Error("error generate jwt token :", err)
+		a.log.ErrorWithFields(ctx, "error generate jwt token ", err)
 		return model.LoginResponse{}, err
 	}
-
 	jwtRefreshToken, _, err := util.GenerateJwtToken(util.JWTParams{
 		Payload:    user.UUID,
 		SecretKey:  a.config.SECRET_KEY_JWT,
 		ExpireTime: a.config.JWT_REFRESH_EXPIRE_TIME,
 	})
-
 	if err != nil {
-		a.log.WithFields(logrus.Fields{
-			"trace_id": ctx.Value("trace_id"),
-			"module":   "auth_usecase",
-			"method":   "Login",
-		}).Error("error generate jwt refresh token :", err)
+		a.log.ErrorWithFields(ctx, "error generate jwt refresh token ", err)
+
 		return model.LoginResponse{}, err
 	}
+	if err := tx.Commit().Error; err != nil {
+		a.log.ErrorWithFields(ctx, "error commit transaction ", err)
 
-	a.log.WithFields(logrus.Fields{
-		"trace_id": ctx.Value("trace_id"),
-		"module":   "auth_usecase",
-		"method":   "Login",
-	}).Info("login successfully")
-
+		return model.LoginResponse{}, err
+	}
 	return model.LoginResponse{
 		Token:        jwtToken,
 		RefreshToken: jwtRefreshToken,
@@ -92,64 +67,51 @@ func (a *authUsecase) Login(ctx context.Context, request model.LoginRequest) (mo
 	}, nil
 }
 
-func (a *authUsecase) Register(ctx context.Context, request model.RegisterRequest) error {
-	a.log.WithFields(logrus.Fields{
-		"trace_id": ctx.Value("trace_id"),
-		"module":   "auth_usecase",
-		"method":   "Register",
-	}).Info("register request ")
-
-	user, err := a.userRepo.GetUserIDByEmail(ctx, request.Email)
+func (a *AuthUsecase) Register(ctx *gin.Context, request model.RegisterRequest) error {
+	tx := a.db.WithContext(ctx).Begin()
+	defer tx.Rollback()
+	user, err := a.userRepo.CountByEmail(tx, request.Email)
 	if err == nil && user != 0 {
-		a.log.WithFields(logrus.Fields{
-			"trace_id": ctx.Value("trace_id"),
-			"module":   "auth_usecase",
-			"method":   "Register",
-		}).Error("email already exist")
+		a.log.ErrorWithFields(ctx, "email already exists ", err)
+
 		return constants.ErrUserAlreadyExist
 	}
-
 	hashPassword, err := util.HashPassword(request.Password)
 	if err != nil {
-		a.log.WithFields(logrus.Fields{
-			"trace_id": ctx.Value("trace_id"),
-			"module":   "auth_usecase",
-			"method":   "Register",
-		}).Error("error hashing password")
+		a.log.ErrorWithFields(ctx, "error hashing password ", err)
+
 		return err
 	}
-
 	var newUser entity.User
 	newUser.Email = request.Email
 	newUser.UserCode = util.GenerateNumber(4)
 	newUser.Password = hashPassword
 	newUser.PhoneNumber = request.PhoneNumber
-
-	_, err = a.userRepo.CreateUser(ctx, &newUser)
+	err = a.userRepo.Create(tx, &newUser)
 	if err != nil {
-		a.log.WithFields(logrus.Fields{
-			"trace_id": ctx.Value("trace_id"),
-			"module":   "auth_usecase",
-			"method":   "Register",
-		}).Error("error create user", err)
+		a.log.ErrorWithFields(ctx, "error create user ", err)
 		return err
 	}
+	if err := tx.Commit().Error; err != nil {
+		a.log.ErrorWithFields(ctx, "error commit transaction ", err)
 
-	a.log.WithFields(logrus.Fields{
-		"trace_id": ctx.Value("trace_id"),
-		"module":   "auth_usecase",
-		"method":   "Register",
-	}).Info("register successfully")
-
+		return err
+	}
 	return nil
-
 }
 
-func NewAuthUsecase(log *logrus.Logger, authRepo repository.AuthRepository, userRepo repository.UserRepository, config util.Config) AuthUsecase {
-	return &authUsecase{
-		log:      log,
+func NewAuthUsecase(
+	db *gorm.DB,
+	log *logger.CustomLogger,
+	config util.Config,
+	authRepo *repository.AuthRepository,
+	userRepo *repository.UserRepository,
+) *AuthUsecase {
+	return &AuthUsecase{
+		db:       db,
+		log:      log.Module("auth-service"),
+		config:   config,
 		authRepo: authRepo,
 		userRepo: userRepo,
-		config:   config,
 	}
 }
