@@ -2,6 +2,10 @@ package constants
 
 import "errors"
 
+func ErrNotFound(text string) error {
+	return errors.New(text + " not found")
+}
+
 var (
 	// REsponse JSON
 	Response = "response"

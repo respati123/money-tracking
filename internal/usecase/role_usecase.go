@@ -17,6 +17,7 @@ type RoleUsecase struct {
 	roleRepository *repository.RoleRepository
 	log            *zap.Logger
 	db             *gorm.DB
+	response       model.ResponseInterface
 }
 
 func NewRoleUsecase(db *gorm.DB, log *zap.Logger, roleRepository *repository.RoleRepository) *RoleUsecase {
@@ -24,6 +25,7 @@ func NewRoleUsecase(db *gorm.DB, log *zap.Logger, roleRepository *repository.Rol
 		roleRepository: roleRepository,
 		log:            log,
 		db:             db,
+		response:       model.ResponseInterface{},
 	}
 }
 
@@ -82,10 +84,118 @@ func (rs *RoleUsecase) Create(ctx *gin.Context, request model.RoleCreateRequest)
 		}
 	}
 
-	// rs.log.Info("role created", zap.Any("role", role))
 	return model.ResponseInterface{
 		Message:    "role created",
 		StatusCode: http.StatusOK,
 	}
+}
 
+func (rs *RoleUsecase) Update(ctx *gin.Context, request model.RoleUpdateRequest, uuid string) model.ResponseInterface {
+	tx := rs.db.WithContext(ctx)
+
+	count, err := rs.roleRepository.CountById(tx, uuid)
+	if err != nil {
+		rs.log.Error("error find count by id", zap.Any("error", err.Error()))
+		return model.ResponseInterface{
+			Message:    "error role services",
+			StatusCode: http.StatusInternalServerError,
+			Error:      err,
+		}
+	}
+
+	if count == 0 {
+		rs.log.Error("role id not found", zap.Any("error", err.Error()))
+		return model.ResponseInterface{
+			Message:    "role id not found",
+			StatusCode: http.StatusBadRequest,
+			Error:      err,
+		}
+	}
+
+	var role = new(entity.Role)
+	role.Name = request.Name
+	role.Alias = request.Alias
+	role.RoleCode = util.GenerateNumber(4)
+
+	tx = tx.Begin()
+
+	defer func() {
+		if r := recover(); r != nil {
+			tx.Rollback()
+		}
+	}()
+
+	err = rs.roleRepository.Update(tx, role)
+
+	if err != nil {
+		tx.Rollback()
+		rs.log.Error("error while update role", zap.Any("error", err.Error()))
+		return model.ResponseInterface{
+			Message:    "error update role",
+			StatusCode: http.StatusInternalServerError,
+			Error:      err,
+		}
+	}
+
+	if err := tx.Commit().Error; err != nil {
+		rs.log.Error("error while transaction commit", zap.Any("error", err.Error()))
+		return model.ResponseInterface{
+			Message:    "error while transaction commit",
+			StatusCode: http.StatusInternalServerError,
+			Error:      err,
+		}
+	}
+
+	return model.ResponseInterface{
+		Message:    constants.Success,
+		StatusCode: http.StatusOK,
+		Data:       "successfully updated the role.",
+	}
+
+}
+
+func (rs *RoleUsecase) Delete(ctx *gin.Context, id string) model.ResponseInterface {
+	tx := rs.db.WithContext(ctx)
+
+	var role = new(entity.Role)
+	err := rs.roleRepository.FindByField(tx, role, "uuid", id)
+	if err != nil {
+		rs.log.Error("Error while count by id", zap.Any("error", err.Error()))
+		rs.response.Message = constants.Error
+		rs.response.Error = err
+		rs.response.StatusCode = http.StatusInternalServerError
+		return rs.response
+	}
+
+	tx.Begin()
+
+	defer func() {
+		if err := recover(); err != nil {
+			tx.Rollback()
+		}
+	}()
+	err = rs.roleRepository.Delete(tx, role)
+
+	if err != nil {
+		rs.log.Error("error while delete role", zap.Any("error", err.Error()))
+		rs.response.Message = constants.Error
+		rs.response.StatusCode = http.StatusInternalServerError
+		rs.response.Error = err
+		return rs.response
+	}
+
+	if err := tx.Commit().Error; err != nil {
+		rs.log.Error("error while transaction commit", zap.Any("error", err.Error()))
+		rs.response.Message = "error while transaction commit"
+		rs.response.StatusCode = http.StatusInternalServerError
+		rs.response.Error = err
+
+		return rs.response
+	}
+
+	rs.response.Message = constants.Success
+	rs.response.StatusCode = http.StatusOK
+	rs.response.Data = "Successfully deleted the role"
+
+	return rs.response
 }
