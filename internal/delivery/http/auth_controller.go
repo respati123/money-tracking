@@ -24,7 +24,6 @@ type AuthController struct {
 // @Success 200 {object} model.Response{response_data=model.LoginResponse}
 // @Router /auth/login [post]
 func (a *AuthController) Login(ctx *gin.Context) {
-func (a *AuthController) Login(ctx *gin.Context) {
 	var loginRequest model.LoginRequest
 	if err := ctx.ShouldBindJSON(&loginRequest); err != nil {
 		a.log.Info("error binding request", zap.Error(err))
@@ -45,7 +44,6 @@ func (a *AuthController) Login(ctx *gin.Context) {
 // @Param registerRequest body model.RegisterRequest true "Register Request"
 // @Success 200 {object} model.Response{response_data=string}
 // @Router /auth/register [post]
-func (a *AuthController) Register(ctx *gin.Context) {
 func (a *AuthController) Register(ctx *gin.Context) {
 	var registerRequest model.RegisterRequest
 	err := ctx.ShouldBindJSON(&registerRequest)

@@ -2,7 +2,7 @@ package configs
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/respati123/money-tracking/internal/configs/logger"
+	"github.com/redis/go-redis/v9"
 	"github.com/respati123/money-tracking/internal/delivery/http"
 	"github.com/respati123/money-tracking/internal/delivery/http/middleware"
 	"github.com/respati123/money-tracking/internal/delivery/http/route"
@@ -11,15 +11,17 @@ import (
 	"github.com/respati123/money-tracking/internal/usecase"
 	"github.com/respati123/money-tracking/internal/util"
 	"github.com/spf13/viper"
+	"go.uber.org/zap"
 	"gorm.io/gorm"
 )
 
 type BootstrapConfig struct {
 	DB     *gorm.DB
-	Log    *logger.CustomLogger
+	Log    *zap.Logger
 	Viper  *viper.Viper
 	App    *gin.Engine
 	Config util.Config
+	Redis  *redis.Client
 }
 
 func Bootstrap(config *BootstrapConfig) {
@@ -35,7 +37,7 @@ func Bootstrap(config *BootstrapConfig) {
 
 	// setup service
 	userUseCase := usecase.NewUserUsecase(config.DB, config.Log, converter, userRepository)
-	authUseCase := usecase.NewAuthUsecase(config.DB, config.Log, config.Config, authRepository, userRepository)
+	authUseCase := usecase.NewAuthUsecase(config.DB, config.Log, config.Config, config.Redis, authRepository, userRepository)
 
 	// setup controllers
 	userController := http.NewUserController(userUseCase, config.Log)
