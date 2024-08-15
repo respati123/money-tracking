@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/respati123/money-tracking/configs"
+	"github.com/respati123/money-tracking/configs/logger"
 	"github.com/respati123/money-tracking/docs"
 	_ "github.com/respati123/money-tracking/docs"
 )
@@ -17,12 +18,13 @@ import (
 func main() {
 
 	config, viper := configs.InitConfig()
-	log := configs.NewLogger(viper)
+	log := logger.NewLogger(viper)
 	db := configs.Database(config, log)
+	redis := configs.NewRedis(viper, log)
 	app := configs.NewGin(viper)
 
 	// setup swagger
-	docs.SwaggerInfo.Host = "localhost:8081"
+	docs.SwaggerInfo.Host = "localhost:8080"
 	docs.SwaggerInfo.Schemes = []string{"http", "https"}
 
 	configs.Bootstrap(&configs.BootstrapConfig{
@@ -31,6 +33,7 @@ func main() {
 		Viper:  viper,
 		App:    app,
 		Config: config,
+		Redis:  redis,
 	})
 	app.Run(":" + viper.GetString("PORT_SERVER"))
 }

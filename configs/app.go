@@ -2,47 +2,62 @@ package configs
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/redis/go-redis/v9"
 	"github.com/respati123/money-tracking/internal/delivery/http"
 	"github.com/respati123/money-tracking/internal/delivery/http/middleware"
 	"github.com/respati123/money-tracking/internal/delivery/http/route"
+	"github.com/respati123/money-tracking/internal/model/converter"
 	"github.com/respati123/money-tracking/internal/repository"
 	"github.com/respati123/money-tracking/internal/usecase"
 	"github.com/respati123/money-tracking/internal/util"
-	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
+	"go.uber.org/zap"
 	"gorm.io/gorm"
 )
 
 type BootstrapConfig struct {
 	DB     *gorm.DB
-	Log    *logrus.Logger
+	Log    *zap.Logger
 	Viper  *viper.Viper
 	App    *gin.Engine
 	Config util.Config
+	Redis  *redis.Client
 }
 
 func Bootstrap(config *BootstrapConfig) {
 
+	// converter
+	converter := converter.NewConverter()
+
 	// setup repository
-	userRepository := repository.NewUserRepository(config.DB, config.Log)
-	authRepository := repository.NewAuthRepository(config.DB, config.Log)
+	userRepository := repository.NewUserRepository(config.Log)
+	authRepository := repository.NewAuthRepository(config.Log)
+	roleRepository := repository.NewRoleRepository(config.Log)
 
 	// setup service
-	userUseCase := usecase.NewUserService(userRepository, config.DB, config.Log)
-	authUseCase := usecase.NewAuthUsecase(config.Log, authRepository, userRepository, config.Config)
+	userUseCase := usecase.NewUserUsecase(config.DB, config.Log, converter, userRepository)
+	authUseCase := usecase.NewAuthUsecase(config.DB, config.Log, config.Config, config.Redis, authRepository, userRepository)
+	roleUsecase := usecase.NewRoleUsecase(config.DB, config.Log, roleRepository)
 
 	// setup controllers
-	userController := http.NewUserController(userUseCase, config.DB, config.Log)
-	authController := http.NewAuthController(config.Log, authUseCase)
+	userController := http.NewUserController(userUseCase, config.Log)
+	authController := http.NewAuthController(authUseCase, config.Log)
+	roleController := http.NewRoleController(roleUsecase, config.Log)
 
 	// setup middleware
 	traceIdMiddleware := middleware.NewTraceMiddleware()
+	responseMiddleware := middleware.ResponseMiddleware()
+	authMiddleware := middleware.AuthMiddleware(config.Redis, config.Viper, config.Log, config.DB)
 
 	routeConfig := route.RouteConfig{
-		App:               config.App,
-		UserController:    userController,
-		AuthController:    authController,
-		TraceIdMiddleware: traceIdMiddleware,
+		App:            config.App,
+		UserController: userController,
+		AuthController: authController,
+		RoleController: roleController,
+		// middleware
+		TraceIdMiddleware:  traceIdMiddleware,
+		ResponseMiddleware: responseMiddleware,
+		AuthMiddleware:     authMiddleware,
 	}
 	routeConfig.Setup()
 }

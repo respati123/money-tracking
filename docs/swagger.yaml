@@ -41,6 +41,47 @@ definitions:
       response_message:
         type: string
     type: object
+  model.RoleCreateRequest:
+    properties:
+      alias:
+        type: string
+      name:
+        type: string
+    type: object
+  model.UserCreateRequest:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+      phone_number:
+        type: string
+    type: object
+  model.UserResponse:
+    properties:
+      created_at:
+        type: string
+      created_by:
+        type: integer
+      deleted_at:
+        type: string
+      deleted_by:
+        type: integer
+      email:
+        type: string
+      id:
+        type: integer
+      phone_number:
+        type: string
+      updated_at:
+        type: string
+      updated_by:
+        type: integer
+      user_code:
+        type: integer
+      uuid:
+        type: string
+    type: object
 host: localhost:8080
 info:
   contact:
@@ -105,7 +146,54 @@ paths:
       summary: Register
       tags:
       - auth
-  /users:
+  /roles/:
+    post:
+      consumes:
+      - application/json
+      description: Create Role
+      parameters:
+      - description: Role Create Request
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/model.RoleCreateRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully create role
+          schema:
+            allOf:
+            - $ref: '#/definitions/model.Response'
+            - properties:
+                response_data:
+                  type: string
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            allOf:
+            - $ref: '#/definitions/model.Response'
+            - properties:
+                response_data:
+                  type: string
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/model.Response'
+            - properties:
+                response_data:
+                  type: string
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: Create Role
+      tags:
+      - Role
+  /users/:
     post:
       consumes:
       - application/json
@@ -172,12 +260,97 @@ paths:
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/http.ErrorResponse'
-      summary: Get a user by ID
-    put:
-      consumes:
+            allOf:
+            - $ref: '#/definitions/model.Response'
+            - properties:
+                response_data:
+                  type: string
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: Create a new user
+      tags:
+      - Users
+  /users/{user_code}:
+    get:
+      description: Get User
+      parameters:
+      - description: user_code user
+        in: path
+        name: user_code
+        required: true
+        type: integer
+      produces:
       - application/json
-      description: Updates an existing user
+      responses:
+        "200":
+          description: success Get user
+          schema:
+            allOf:
+            - $ref: '#/definitions/model.Response'
+            - properties:
+                response_data:
+                  $ref: '#/definitions/model.UserResponse'
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: Get User
+      tags:
+      - Users
+  /users/{uuid}:
+    delete:
+      description: Delete a new user
+      parameters:
+      - description: uuid user
+        in: path
+        name: uuid
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: success delete user
+          schema:
+            allOf:
+            - $ref: '#/definitions/model.Response'
+            - properties:
+                response_data:
+                  type: string
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: Delete user
+      tags:
+      - Users
+    put:
+      description: Update User
+      parameters:
+      - description: uuid user
+        in: path
+        name: uuid
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: success update user
+          schema:
+            allOf:
+            - $ref: '#/definitions/model.Response'
+            - properties:
+                response_data:
+                  type: string
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: Update User
+      tags:
+      - Users
+  /users/list:
+    post:
+      description: Retrieves a list of users
       parameters:
       - description: User ID
         in: path

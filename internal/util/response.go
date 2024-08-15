@@ -8,16 +8,27 @@ import (
 
 func SendSuccessResponse(ctx *gin.Context, statusCode int, message string, data interface{}) {
 	ctx.Set(constants.Response, model.Response{
+		ResponseCode:    statusCode,
 		ResponseMessage: message,
 		ResponseData:    data,
 	})
 	ctx.Status(statusCode)
 }
 
-func SendErrorResponse(ctx *gin.Context, statusCode int, message string, err error) {
+func SendErrorResponse(ctx *gin.Context, statusCode int, message string) {
 	ctx.Set(constants.Response, model.Response{
-		ResponseMessage: message,
-		ResponseError:   err.Error(),
+		ResponseCode:    statusCode,
+		ResponseMessage: constants.Error,
+		ResponseError:   message,
 	})
 	ctx.Status(statusCode)
+	ctx.Abort()
+}
+
+func Response(ctx *gin.Context, response model.ResponseInterface) {
+	if response.Error != nil {
+		SendErrorResponse(ctx, response.StatusCode, response.Message)
+	} else {
+		SendSuccessResponse(ctx, response.StatusCode, response.Message, response.Data)
+	}
 }
