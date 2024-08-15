@@ -51,3 +51,6 @@ migrations-down:
 
 migrations-force: 
 	migrate -database postgresql://$(DB_USER):$(DB_PASS)@localhost:5434/$(DB_NAME)?sslmode=disable -path db/migrations force
+
+swagger:
+	swag init -g cmd/money/main.go

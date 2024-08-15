@@ -17,7 +17,7 @@ type AuthController struct {
 
 // @Summary Login
 // @Description Login
-// @Tags auth
+// @Tags Auth
 // @Accept json
 // @Produce json
 // @Param loginRequest body model.LoginRequest true "Login Request"
@@ -38,7 +38,7 @@ func (a *AuthController) Login(ctx *gin.Context) {
 
 // @Summary Register
 // @Description Register
-// @Tags auth
+// @Tags Auth
 // @Accept json
 // @Produce json
 // @Param registerRequest body model.RegisterRequest true "Register Request"

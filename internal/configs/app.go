@@ -45,12 +45,16 @@ func Bootstrap(config *BootstrapConfig) {
 
 	// setup middleware
 	traceIdMiddleware := middleware.NewTraceMiddleware()
+	responseMiddleware := middleware.ResponseMiddleware()
+	authMiddleware := middleware.AuthMiddleware(config.Redis, config.Viper, config.Log, config.DB)
 
 	routeConfig := route.RouteConfig{
-		App:               config.App,
-		UserController:    userController,
-		AuthController:    authController,
-		TraceIdMiddleware: traceIdMiddleware,
+		App:                config.App,
+		UserController:     userController,
+		AuthController:     authController,
+		TraceIdMiddleware:  traceIdMiddleware,
+		ResponseMiddleware: responseMiddleware,
+		AuthMiddleware:     authMiddleware,
 	}
 	routeConfig.Setup()
 }
