@@ -1,40 +1,37 @@
 package converter
 
 import (
-	"time"
-
 	"github.com/respati123/money-tracking/internal/entity"
 	"github.com/respati123/money-tracking/internal/model"
 )
 
-type UserConverter struct {
-	// ctx *gin.Context
+type UserConverter struct{}
+
+func NewUserConverter() *UserConverter {
+	return &UserConverter{}
 }
 
-func NewUserConverter() UserConverter {
-	return UserConverter{
-		// ctx: ctx,
-	}
-}
+func (uc *UserConverter) ToUserResponse(user *entity.User) *model.UserResponse {
 
-func (u *UserConverter) ToResponseUser(user *entity.User) *model.UserResponse {
 	return &model.UserResponse{
 		ID:          user.ID,
-		UserCode:    user.UserCode,
+		UUID:        user.UUID.String(),
 		Email:       user.Email,
 		PhoneNumber: user.PhoneNumber,
-		CreatedAt:   user.CreatedAt.Format(time.RFC3339),
-		UpdatedAt:   user.UpdatedAt.Format(time.RFC3339),
+		UserCode:    user.UserCode,
+		CreatedAt:   user.CreatedAt.Format("2006-01-02 15:04:05"),
+		UpdatedAt:   user.UpdatedAt.Format("2006-01-02 15:04:05"),
+		DeletedAt:   user.DeletedAt.Time.Format("2006-01-02 15:04:05"),
 		CreatedBy:   user.CreatedBy,
 		UpdatedBy:   user.UpdatedBy,
+		DeletedBy:   user.DeletedBy,
 	}
 }
 
-func (u *UserConverter) ToResponseUsers(users *[]entity.User) *[]model.UserResponse {
-	var userResponses []model.UserResponse
+func (uc *UserConverter) ToUserResponses(users *[]entity.User) *[]model.UserResponse {
+	var userResponse []model.UserResponse
 	for _, user := range *users {
-		userResponses = append(userResponses, *u.ToResponseUser(&user))
+		userResponse = append(userResponse, *uc.ToUserResponse(&user))
 	}
-
-	return &userResponses
+	return &userResponse
 }

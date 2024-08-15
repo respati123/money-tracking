@@ -26,10 +26,8 @@ func ResponseMiddleware() gin.HandlerFunc {
 		switch ctx.Writer.Status() {
 		case http.StatusOK:
 			ctx.JSON(http.StatusOK, response)
-
 		case http.StatusUnauthorized:
 			ctx.JSON(http.StatusUnauthorized, response)
-
 		case http.StatusBadRequest:
 			ctx.JSON(http.StatusBadRequest, response)
 		case http.StatusForbidden:
@@ -39,6 +37,5 @@ func ResponseMiddleware() gin.HandlerFunc {
 		default:
 			ctx.JSON(http.StatusInternalServerError, response)
 		}
-
 	}
 }

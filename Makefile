@@ -16,6 +16,11 @@ swagger-generate:
 run:
 	@echo DB_HOST is $(DB_HOST)
 	@echo DB_PORT is $(DB_PORT)
+
+run-local:
+	cp env/.env.local .env
+	go run cmd/money/main.go
+
 run-dev:
 	cp env/.env.development .env
 	go run cmd/money/main.go

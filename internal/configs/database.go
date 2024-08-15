@@ -5,13 +5,14 @@ import (
 	"time"
 
 	"github.com/respati123/money-tracking/internal/util"
-	"github.com/sirupsen/logrus"
+	"go.uber.org/zap"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
+	"gorm.io/gorm/schema"
 )
 
-func Database(config util.Config, log *logrus.Logger) *gorm.DB {
+func Database(config util.Config, log *zap.Logger) *gorm.DB {
 
 	postgresqlDbInfo1 := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable",
 		config.DB_HOST,
@@ -22,22 +23,25 @@ func Database(config util.Config, log *logrus.Logger) *gorm.DB {
 	)
 
 	db, err := gorm.Open(postgres.Open(postgresqlDbInfo1), &gorm.Config{
-		Logger: logger.New(&logrusWriter{Logger: log}, logger.Config{
-			SlowThreshold:             time.Second * 5,
-			Colorful:                  false,
-			IgnoreRecordNotFoundError: true,
-			ParameterizedQueries:      true,
+		NamingStrategy: schema.NamingStrategy{
+			SingularTable: false,
+		},
+		Logger: logger.New(zap.NewStdLog(log), logger.Config{
+			SlowThreshold:             time.Second,
+			Colorful:                  true,
+			IgnoreRecordNotFoundError: false,
+			ParameterizedQueries:      false,
 			LogLevel:                  logger.Info,
 		}),
 	})
 
 	if err != nil {
-		log.Fatalf("failed to connect database: %v", err)
+		log.Fatal("failed to connect database: %v", zap.Error(err))
 	}
 
 	connection, err := db.DB()
 	if err != nil {
-		log.Fatalf("failed to connect database: %v", err)
+		log.Fatal("failed to connect database: %v", zap.Error(err))
 	}
 
 	connection.SetMaxIdleConns(config.DB_POOL_IDLE)
@@ -45,12 +49,4 @@ func Database(config util.Config, log *logrus.Logger) *gorm.DB {
 	connection.SetConnMaxLifetime(time.Second * time.Duration(config.DB_POOL_LIFETIME))
 
 	return db
-}
-
-type logrusWriter struct {
-	Logger *logrus.Logger
-}
-
-func (l *logrusWriter) Printf(message string, args ...interface{}) {
-	l.Logger.Tracef(message, args...)
 }

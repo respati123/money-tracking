@@ -1,9 +1,6 @@
 package repository
 
 import (
-	"errors"
-	"reflect"
-
 	"github.com/respati123/money-tracking/internal/model"
 	"gorm.io/gorm"
 )
@@ -30,7 +27,12 @@ func (r *Repository[T]) CountById(db *gorm.DB, uuid string) (int64, error) {
 	return total, err
 }
 
-func (r *Repository[T]) FindAll(db *gorm.DB, result *[]T, request model.PaginationRequest) (*[]T, model.PaginationModel, error) {
+func (r *Repository[T]) FindByField(db *gorm.DB, data *T, field string, value string) error {
+	err := db.Model(new(T)).Where(field+"=?", value).First(&data).Error
+	return err
+}
+
+func (r *Repository[T]) FindAll(db *gorm.DB, result *[]T, request model.PaginationRequest) (*[]T, model.PaginationMetadata, error) {
 
 	var (
 		totalData int64
@@ -40,10 +42,6 @@ func (r *Repository[T]) FindAll(db *gorm.DB, result *[]T, request model.Paginati
 
 	if request.Filter != nil {
 		for key, value := range request.Filter {
-			_, isExist := reflect.TypeOf(new(T)).Elem().FieldByName(key)
-			if !isExist {
-				return nil, model.PaginationModel{}, errors.New(" field " + key + " is not exist")
-			}
 			db = db.Where(key+"=?", value)
 		}
 	}
@@ -58,14 +56,14 @@ func (r *Repository[T]) FindAll(db *gorm.DB, result *[]T, request model.Paginati
 		totalPage = int(totalData) / request.PerPage
 	}
 
-	metadata := model.PaginationModel{
-		TotalData:   int(totalData),
-		TotalPage:   totalPage,
-		CurrentPage: request.Page,
-		PerPage:     request.PerPage,
+	metadata := model.PaginationMetadata{
+		TotalData: int(totalData),
+		TotalPage: totalPage,
+		Page:      request.Page,
+		PerPage:   request.PerPage,
 	}
 	if err != nil {
-		return nil, model.PaginationModel{}, err
+		return nil, model.PaginationMetadata{}, err
 	}
 
 	return result, metadata, nil

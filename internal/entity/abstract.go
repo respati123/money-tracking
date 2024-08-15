@@ -14,7 +14,7 @@ type Model struct {
 }
 
 type Base struct {
-	CreatedBy string
-	UpdatedBy string
-	DeletedBy string
+	CreatedBy int
+	UpdatedBy int `gorm:"default:NULL"`
+	DeletedBy int `gorm:"default:NULL"`
 }

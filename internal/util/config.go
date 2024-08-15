@@ -15,9 +15,9 @@ type Config struct {
 	DB_POOL_LIFETIME int    `mapstructure:"DB_POOL_LIFETIME"`
 
 	// JWT
-	SECRET_KEY_JWT          string `mapstructure:"SECRET_KEY_JWT"`
+	JWT_SECRET_KEY          string `mapstructure:"JWT_SECRET_KEY"`
 	JWT_EXPIRE_TIME         int    `mapstructure:"JWT_EXPIRE_TIME"`
-	JWT_REFRESH_EXPIRE_TIME int    `mapstructure:"JWT_REFRESH_EXPIRE_TIME"`
+	JWT_EXPIRE_REFRESH_TIME int    `mapstructure:"JWT_EXPIRE_REFRESH_TIME"`
 
 	// PORT SERVER
 	PORT_SERVER string `mapstructure:"PORT_SERVER"`

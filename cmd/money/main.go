@@ -31,7 +31,8 @@ func main() {
 
 	config, viper := configs.InitConfig()
 	log := logger.NewLogger(viper)
-	db := configs.Database(config, log.Logger())
+	db := configs.Database(config, log)
+	redis := configs.NewRedis(viper, log)
 	app := configs.NewGin(viper)
 
 	// setup swagger
@@ -52,6 +53,7 @@ func main() {
 		Viper:  viper,
 		App:    app,
 		Config: config,
+		Redis:  redis,
 	})
 	app.Run(":" + viper.GetString("PORT_SERVER"))
 }

@@ -1,5 +1,9 @@
 package model
 
+type UserFilter struct {
+	Email       string `json:"email"`
+	PhoneNumber string `json:"phone_number"`
+}
 type UserCreateRequest struct {
 	Email       string `json:"email"`
 	Password    string `json:"password"`
@@ -15,9 +19,9 @@ type UserResponse struct {
 	CreatedAt   string `json:"created_at"`
 	UpdatedAt   string `json:"updated_at"`
 	DeletedAt   string `json:"deleted_at"`
-	CreatedBy   string `json:"created_by"`
-	UpdatedBy   string `json:"updated_by"`
-	DeletedBy   string `json:"deleted_by"`
+	CreatedBy   int    `json:"created_by"`
+	UpdatedBy   int    `json:"updated_by"`
+	DeletedBy   int    `json:"deleted_by"`
 }
 
 type UserUpdateRequest struct {

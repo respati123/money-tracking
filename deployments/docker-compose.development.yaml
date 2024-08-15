@@ -1,6 +1,31 @@
 version: '3.5'
 
 services:
+  redisinsight:
+    container_name: redisinsight
+    image: redislabs/redisinsight:latest
+    ports:
+      - "5540:5540"
+    restart: always
+    networks:
+      - db_postgresql
+    env_file:
+      - ../.env
+    volumes:
+      - redisinsight:/data
+  redis: 
+    container_name: dragonfly
+    image: docker.dragonflydb.io/dragonflydb/dragonfly
+    networks:
+      - db_postgresql
+    ports:
+      - "6379:6379"
+    env_file:
+      - ../.env
+    volumes:
+      - db_redis:/data
+    restart: always
+    
   api:
     command: bash -c "cp env/.env.development app.env"
     container_name: api
@@ -31,10 +56,10 @@ services:
     volumes:
       - db_postgresql:/var/lib/postgresql/data
       - ../initdb:/docker-entrypoint-initdb.d
-
-
 volumes:
   db_postgresql:
+  db_redis:
+  redisinsight:
 networks:
   db_postgresql:
     driver: bridge

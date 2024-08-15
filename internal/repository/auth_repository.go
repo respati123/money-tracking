@@ -1,34 +1,33 @@
 package repository
 
 import (
-	"github.com/respati123/money-tracking/internal/configs/logger"
+	"fmt"
+
 	"github.com/respati123/money-tracking/internal/entity"
 	"github.com/respati123/money-tracking/internal/model"
+	"go.uber.org/zap"
 	"gorm.io/gorm"
 )
 
 type AuthRepository struct {
-	log *logger.CustomLogger
+	log *zap.Logger
 }
 
 func (a *AuthRepository) Login(tx *gorm.DB, request model.LoginRequest) (*entity.User, error) {
 	var user entity.User
-	err := tx.Take(&user, "email = ?", request.Email).Error
+	err := tx.Find(&user, "email = ?", request.Email).Error
 	if err != nil {
+		fmt.Print("pritn", err)
 		return nil, err
 	}
 	return &user, nil
 }
 
 func (a *AuthRepository) Register(tx *gorm.DB, user *entity.User) error {
-	err := tx.Create(user).Error
-	if err != nil {
-		return err
-	}
-	return nil
+	return tx.Create(&user).Error
 }
 
-func NewAuthRepository(log *logger.CustomLogger) *AuthRepository {
+func NewAuthRepository(log *zap.Logger) *AuthRepository {
 	return &AuthRepository{
 		log: log,
 	}
