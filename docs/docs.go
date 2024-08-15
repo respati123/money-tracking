@@ -5,6 +5,9 @@ import "github.com/swaggo/swag"
 
 const docTemplate = `{
     "schemes": {{ marshal .Schemes }},
+    "produces": [
+        "application/json"
+    ],
     "swagger": "2.0",
     "info": {
         "description": "{{escape .Description}}",
@@ -111,94 +114,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/roles/": {
-            "post": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "description": "Create Role",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Role"
-                ],
-                "summary": "Create Role",
-                "parameters": [
-                    {
-                        "description": "Role Create Request",
-                        "name": "body",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/model.RoleCreateRequest"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Successfully create role",
-                        "schema": {
-                            "allOf": [
-                                {
-                                    "$ref": "#/definitions/model.Response"
-                                },
-                                {
-                                    "type": "object",
-                                    "properties": {
-                                        "response_data": {
-                                            "type": "string"
-                                        }
-                                    }
-                                }
-                            ]
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "allOf": [
-                                {
-                                    "$ref": "#/definitions/model.Response"
-                                },
-                                {
-                                    "type": "object",
-                                    "properties": {
-                                        "response_data": {
-                                            "type": "string"
-                                        }
-                                    }
-                                }
-                            ]
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "allOf": [
-                                {
-                                    "$ref": "#/definitions/model.Response"
-                                },
-                                {
-                                    "type": "object",
-                                    "properties": {
-                                        "response_data": {
-                                            "type": "string"
-                                        }
-                                    }
-                                }
-                            ]
-                        }
-                    }
-                }
-            }
-        },
-        "/users/": {
+        "/users/create": {
             "post": {
                 "security": [
                     {
@@ -304,157 +220,9 @@ const docTemplate = `{
                     }
                 }
             }
-        },
-        "/users/{user_code}": {
-            "get": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "description": "Get User",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Users"
-                ],
-                "summary": "Get User",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "description": "user_code user",
-                        "name": "user_code",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "success Get user",
-                        "schema": {
-                            "allOf": [
-                                {
-                                    "$ref": "#/definitions/model.Response"
-                                },
-                                {
-                                    "type": "object",
-                                    "properties": {
-                                        "response_data": {
-                                            "$ref": "#/definitions/model.UserResponse"
-                                        }
-                                    }
-                                }
-                            ]
-                        }
-                    }
-                }
-            }
-        },
-        "/users/{uuid}": {
-            "put": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "description": "Update User",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Users"
-                ],
-                "summary": "Update User",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "uuid user",
-                        "name": "uuid",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "success update user",
-                        "schema": {
-                            "allOf": [
-                                {
-                                    "$ref": "#/definitions/model.Response"
-                                },
-                                {
-                                    "type": "object",
-                                    "properties": {
-                                        "response_data": {
-                                            "type": "string"
-                                        }
-                                    }
-                                }
-                            ]
-                        }
-                    }
-                }
-            },
-            "delete": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "description": "Delete a new user",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Users"
-                ],
-                "summary": "Delete user",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "uuid user",
-                        "name": "uuid",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "success delete user",
-                        "schema": {
-                            "allOf": [
-                                {
-                                    "$ref": "#/definitions/model.Response"
-                                },
-                                {
-                                    "type": "object",
-                                    "properties": {
-                                        "response_data": {
-                                            "type": "string"
-                                        }
-                                    }
-                                }
-                            ]
-                        }
-                    }
-                }
-            }
         }
     },
     "definitions": {
-        "http.CreateUserRequest": {
-            "type": "object"
-        },
-        "http.ErrorResponse": {
-            "type": "object"
-        },
-        "http.UpdateUserRequest": {
-            "type": "object"
-        },
-        "http.UserResponse": {
-            "type": "object"
-        },
         "model.LoginRequest": {
             "type": "object",
             "properties": {
@@ -477,6 +245,47 @@ const docTemplate = `{
                 },
                 "token": {
                     "type": "string"
+                }
+            }
+        },
+        "model.PaginationModel": {
+            "type": "object",
+            "properties": {
+                "current_page": {
+                    "type": "integer"
+                },
+                "per_page": {
+                    "type": "integer"
+                },
+                "total_data": {
+                    "type": "integer"
+                },
+                "total_page": {
+                    "type": "integer"
+                }
+            }
+        },
+        "model.PaginationRequest": {
+            "type": "object",
+            "properties": {
+                "filter": {
+                    "type": "object",
+                    "additionalProperties": true
+                },
+                "page": {
+                    "type": "integer"
+                },
+                "per_page": {
+                    "type": "integer"
+                }
+            }
+        },
+        "model.PaginationResponse": {
+            "type": "object",
+            "properties": {
+                "data": {},
+                "metadata": {
+                    "$ref": "#/definitions/model.PaginationModel"
                 }
             }
         },
@@ -506,17 +315,6 @@ const docTemplate = `{
                 }
             }
         },
-        "model.RoleCreateRequest": {
-            "type": "object",
-            "properties": {
-                "alias": {
-                    "type": "string"
-                },
-                "name": {
-                    "type": "string"
-                }
-            }
-        },
         "model.UserCreateRequest": {
             "type": "object",
             "properties": {
@@ -538,19 +336,22 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "created_by": {
-                    "type": "integer"
+                    "type": "string"
                 },
                 "deleted_at": {
                     "type": "string"
                 },
                 "deleted_by": {
-                    "type": "integer"
+                    "type": "string"
                 },
                 "email": {
                     "type": "string"
                 },
                 "id": {
                     "type": "integer"
+                },
+                "password": {
+                    "type": "string"
                 },
                 "phone_number": {
                     "type": "string"
@@ -559,7 +360,7 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "updated_by": {
-                    "type": "integer"
+                    "type": "string"
                 },
                 "user_code": {
                     "type": "integer"
@@ -585,7 +386,7 @@ var SwaggerInfo = &swag.Spec{
 	Version:          "1.0",
 	Host:             "localhost:8080",
 	BasePath:         "/api/v1",
-	Schemes:          []string{},
+	Schemes:          []string{"http", "https"},
 	Title:            "My API",
 	Description:      "Money Tracking Service.",
 	InfoInstanceName: "swagger",

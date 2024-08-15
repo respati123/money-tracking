@@ -18,14 +18,7 @@ require (
 
 require (
 	github.com/KyleBanks/depth v1.2.1 // indirect
-	github.com/cespare/xxhash/v2 v2.2.0 // indirect
-	github.com/cilium/ebpf v0.11.0 // indirect
-	github.com/cosiner/argv v0.1.0 // indirect
-	github.com/cpuguy83/go-md2man/v2 v2.0.2 // indirect
-	github.com/derekparker/trie v0.0.0-20230829180723-39f4de51ef7d // indirect
-	github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f // indirect
-	github.com/go-delve/delve v1.23.0 // indirect
-	github.com/go-delve/liner v1.2.3-0.20231231155935-4726ab1d7f62 // indirect
+	github.com/gin-contrib/cors v1.7.2 // indirect
 	github.com/go-openapi/jsonpointer v0.21.0 // indirect
 	github.com/go-openapi/jsonreference v0.21.0 // indirect
 	github.com/go-openapi/spec v0.21.0 // indirect

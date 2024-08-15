@@ -38,7 +38,7 @@ services:
       - db_postgresql
     restart: always
     env_file:
-      - ../app.env
+      - ../.env
     volumes:
       - ../:/app
     ports:
@@ -50,7 +50,7 @@ services:
       - 5434:5432
     restart: always
     env_file:
-      - ../app.env
+      - ../.env
     networks:
       - db_postgresql
     volumes:

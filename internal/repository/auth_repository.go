@@ -14,6 +14,7 @@ type AuthRepository struct {
 }
 
 func (a *AuthRepository) Login(tx *gorm.DB, request model.LoginRequest) (*entity.User, error) {
+func (a *AuthRepository) Login(tx *gorm.DB, request model.LoginRequest) (*entity.User, error) {
 	var user entity.User
 	err := tx.Find(&user, "email = ?", request.Email).Error
 	if err != nil {

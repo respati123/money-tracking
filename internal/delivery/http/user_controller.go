@@ -23,9 +23,9 @@ func NewUserController(userUseCase *usecase.UserUseCase, log *zap.Logger) *UserC
 	}
 }
 
-// GetUser retrieves a user by ID.
-// @Summary Get a user by ID
-// @Description Retrieves a user by ID
+// GetListUser retrieves a list of users.
+// @Summary Get a list of users
+// @Description Retrieves a list of users
 // @Produce json
 // @Tags Users
 // @Param body body model.PaginationRequest false "Body Pagination"
@@ -45,10 +45,9 @@ func (a *UserController) GetListUser(ctx *gin.Context) {
 	util.Response(ctx, response)
 }
 
-// CreateUser creates a new user.
+// CreateUser creates a new user
 // @Summary Create a new user
-// @Description Creates a new user
-// @Accept json
+// @Description Create a new user
 // @Produce json
 // @Tags Users
 // @Param body body model.UserCreateRequest true "Body User Create"

@@ -44,9 +44,7 @@ func (a *AuthUsecase) Login(ctx *gin.Context, request model.LoginRequest) model.
 			Message:    constants.InvalidEmailAndPassword,
 		}
 	}
-
 	isValid := util.CheckPasswordHash(request.Password, user.Password)
-
 	if !isValid {
 		a.log.Info("checking password", zap.Error(constants.ErrInvalidUsernameAndPassword))
 
@@ -56,13 +54,11 @@ func (a *AuthUsecase) Login(ctx *gin.Context, request model.LoginRequest) model.
 			Message:    constants.InvalidEmailAndPassword,
 		}
 	}
-
 	jwtToken, expiredAt, err := util.GenerateJwtToken(util.JWTParams{
 		Payload:    user.UUID,
 		SecretKey:  a.config.JWT_SECRET_KEY,
 		ExpireTime: a.config.JWT_EXPIRE_TIME,
 	})
-
 	if err != nil {
 		a.log.Info("Generate token", zap.Error(err))
 		return model.ResponseInterface{
@@ -71,13 +67,11 @@ func (a *AuthUsecase) Login(ctx *gin.Context, request model.LoginRequest) model.
 			Message:    constants.InternalServerError,
 		}
 	}
-
 	jwtRefreshToken, _, err := util.GenerateJwtToken(util.JWTParams{
 		Payload:    user.UUID,
 		SecretKey:  a.config.JWT_SECRET_KEY,
 		ExpireTime: a.config.JWT_EXPIRE_TIME,
 	})
-
 	if err != nil {
 		a.log.Info("Generate token refresh token", zap.Error(err))
 
@@ -128,7 +122,6 @@ func (a *AuthUsecase) Register(ctx *gin.Context, request model.RegisterRequest) 
 			Message:    constants.EmailAlreadyExists,
 		}
 	}
-
 	hashPassword, err := util.HashPassword(request.Password)
 	if err != nil {
 		a.log.Info("hashing password", zap.Error(err))
@@ -138,7 +131,6 @@ func (a *AuthUsecase) Register(ctx *gin.Context, request model.RegisterRequest) 
 			Message:    constants.InternalServerError,
 		}
 	}
-
 	var newUser entity.User
 	newUser.Email = request.Email
 	newUser.UserCode = util.GenerateNumber(4)
@@ -185,7 +177,6 @@ func (a *AuthUsecase) insertTokenToRedis(ctx *gin.Context, user *entity.User, jw
 		return err
 	}
 	return nil
-
 }
 
 func NewAuthUsecase(
