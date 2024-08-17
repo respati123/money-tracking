@@ -34,14 +34,17 @@ func Bootstrap(config *BootstrapConfig) {
 	// setup repository
 	userRepository := repository.NewUserRepository(config.Log)
 	authRepository := repository.NewAuthRepository(config.Log)
+	roleRepository := repository.NewRoleRepository(config.Log)
 
 	// setup service
 	userUseCase := usecase.NewUserUsecase(config.DB, config.Log, converter, userRepository)
 	authUseCase := usecase.NewAuthUsecase(config.DB, config.Log, config.Config, config.Redis, authRepository, userRepository)
+	roleUseCase := usecase.NewRoleUsecase(config.DB, config.Log, converter, roleRepository)
 
 	// setup controllers
 	userController := http.NewUserController(userUseCase, config.Log)
 	authController := http.NewAuthController(authUseCase, config.Log)
+	roleController := http.NewRoleController(roleUseCase, config.Log)
 
 	// setup middleware
 	traceIdMiddleware := middleware.NewTraceMiddleware()
@@ -49,9 +52,13 @@ func Bootstrap(config *BootstrapConfig) {
 	authMiddleware := middleware.AuthMiddleware(config.Redis, config.Viper, config.Log, config.DB)
 
 	routeConfig := route.RouteConfig{
-		App:                config.App,
-		UserController:     userController,
-		AuthController:     authController,
+		App: config.App,
+
+		// controller
+		UserController: userController,
+		AuthController: authController,
+		RoleController: roleController,
+		// middleware
 		TraceIdMiddleware:  traceIdMiddleware,
 		ResponseMiddleware: responseMiddleware,
 		AuthMiddleware:     authMiddleware,

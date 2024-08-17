@@ -28,7 +28,7 @@ func (a *AuthController) Login(ctx *gin.Context) {
 	if err := ctx.ShouldBindJSON(&loginRequest); err != nil {
 		a.log.Info("error binding request", zap.Error(err))
 
-		util.SendErrorResponse(ctx, http.StatusBadRequest, "invalid request")
+		util.SendErrorResponse(ctx, http.StatusBadRequest, "invalid request", err)
 		return
 	}
 
@@ -49,7 +49,7 @@ func (a *AuthController) Register(ctx *gin.Context) {
 	err := ctx.ShouldBindJSON(&registerRequest)
 	if err != nil {
 		a.log.Info("error binding request", zap.Error(err))
-		util.SendErrorResponse(ctx, http.StatusBadRequest, "invalid request")
+		util.SendErrorResponse(ctx, http.StatusBadRequest, "invalid request", err)
 		return
 	}
 	response := a.authUsecase.Register(ctx, registerRequest)

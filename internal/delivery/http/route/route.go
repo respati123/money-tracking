@@ -50,5 +50,9 @@ func (c *RouteConfig) SetupPrivateRoute() {
 	roles := protected.Group("/api/v1/roles")
 	{
 		roles.POST("/", c.RoleController.Create)
+		roles.DELETE("/:uuid", c.RoleController.Delete)
+		roles.PUT("/:uuid", c.RoleController.Update)
+		roles.GET("/:role_code", c.RoleController.GetRole)
+		roles.POST("/all", c.RoleController.FindAll)
 	}
 }

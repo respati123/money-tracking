@@ -15,11 +15,11 @@ func SendSuccessResponse(ctx *gin.Context, statusCode int, message string, data 
 	ctx.Status(statusCode)
 }
 
-func SendErrorResponse(ctx *gin.Context, statusCode int, message string) {
+func SendErrorResponse(ctx *gin.Context, statusCode int, message string, err error) {
 	ctx.Set(constants.Response, model.Response{
 		ResponseCode:    statusCode,
-		ResponseMessage: constants.Error,
-		ResponseError:   message,
+		ResponseMessage: message,
+		ResponseError:   err.Error(),
 	})
 	ctx.Status(statusCode)
 	ctx.Abort()
@@ -27,7 +27,7 @@ func SendErrorResponse(ctx *gin.Context, statusCode int, message string) {
 
 func Response(ctx *gin.Context, response model.ResponseInterface) {
 	if response.Error != nil {
-		SendErrorResponse(ctx, response.StatusCode, response.Message)
+		SendErrorResponse(ctx, response.StatusCode, response.Message, response.Error)
 	} else {
 		SendSuccessResponse(ctx, response.StatusCode, response.Message, response.Data)
 	}

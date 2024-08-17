@@ -25,7 +25,7 @@ func AuthMiddleware(redis *redis.Client, viper *viper.Viper, log *zap.Logger, db
 
 		if err != nil {
 			log.Info("when verify jwt token", zap.Error(err))
-			util.SendErrorResponse(c, http.StatusUnauthorized, "unauthorized")
+			util.SendErrorResponse(c, http.StatusUnauthorized, "unauthorized", err)
 			return
 		}
 		var uuidString string
@@ -40,8 +40,8 @@ func AuthMiddleware(redis *redis.Client, viper *viper.Viper, log *zap.Logger, db
 		_, err = redis.Get(c, key).Result()
 
 		if err != nil {
-			log.Info("when verify jwt token to redies", zap.Error(err))
-			util.SendErrorResponse(c, http.StatusUnauthorized, "unauthorized")
+			log.Info("when verify jwt token to redis", zap.Error(err))
+			util.SendErrorResponse(c, http.StatusUnauthorized, "unauthorized", err)
 			return
 		}
 
@@ -50,11 +50,11 @@ func AuthMiddleware(redis *redis.Client, viper *viper.Viper, log *zap.Logger, db
 
 		if err != nil {
 			log.Info("when verify jwt token", zap.Error(err))
-			util.SendErrorResponse(c, http.StatusUnauthorized, "unauthorized")
+			util.SendErrorResponse(c, http.StatusUnauthorized, "unauthorized", err)
 			return
 		}
 
-		c.Set(constants.UserData, &user)
+		c.Set(constants.UserData, user)
 		c.Next()
 
 	}

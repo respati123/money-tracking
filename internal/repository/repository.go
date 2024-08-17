@@ -27,9 +27,14 @@ func (r *Repository[T]) CountById(db *gorm.DB, uuid string) (int64, error) {
 	return total, err
 }
 
-func (r *Repository[T]) FindByField(db *gorm.DB, data *T, field string, value string) error {
+func (r *Repository[T]) FindByField(db *gorm.DB, data *T, field string, value string) (*T, error) {
 	err := db.Model(new(T)).Where(field+"=?", value).First(&data).Error
-	return err
+	return data, err
+}
+
+func (r *Repository[T]) FindByCode(db *gorm.DB, data *T, field string, value int) (*T, error) {
+	err := db.Model(new(T)).Where(field+"=?", value).First(&data).Error
+	return data, err
 }
 
 func (r *Repository[T]) FindAll(db *gorm.DB, result *[]T, request model.PaginationRequest) (*[]T, model.PaginationMetadata, error) {
