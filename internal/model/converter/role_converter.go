@@ -13,7 +13,7 @@ func NewRoleConverter() *RoleConverter {
 	return &RoleConverter{}
 }
 
-func ToRoleResponse(role *entity.Role) *model.RoleResponse {
+func (nr *RoleConverter) ToRoleResponse(role *entity.Role) *model.RoleResponse {
 
 	return &model.RoleResponse{
 		ID:        int(role.ID),
@@ -29,10 +29,10 @@ func ToRoleResponse(role *entity.Role) *model.RoleResponse {
 	}
 }
 
-func ToRoleResponses(roles *[]entity.Role) *[]model.RoleResponse {
+func (nr *RoleConverter) ToRoleResponses(roles *[]entity.Role) *[]model.RoleResponse {
 	var roleResponse []model.RoleResponse
 	for _, role := range *roles {
-		roleResponse = append(roleResponse, *ToRoleResponse(&role))
+		roleResponse = append(roleResponse, *nr.ToRoleResponse(&role))
 	}
 	return &roleResponse
 }

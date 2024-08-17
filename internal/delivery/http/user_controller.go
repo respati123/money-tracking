@@ -38,7 +38,7 @@ func (a *UserController) GetListUser(ctx *gin.Context) {
 	)
 	if err := ctx.ShouldBindJSON(&request); err != nil {
 		a.log.Info("error binding request", zap.Error(err))
-		util.SendErrorResponse(ctx, http.StatusBadRequest, "error binding request")
+		util.SendErrorResponse(ctx, http.StatusBadRequest, "error binding request", err)
 		return
 	}
 	response := a.userUseCase.GetListUser(ctx, request)
@@ -60,7 +60,7 @@ func (a *UserController) CreateUser(ctx *gin.Context) {
 	)
 	if err := ctx.ShouldBindJSON(&request); err != nil {
 		a.log.Info("error binding request", zap.Error(err))
-		util.SendErrorResponse(ctx, http.StatusBadRequest, "error binding request")
+		util.SendErrorResponse(ctx, http.StatusBadRequest, "error binding request", err)
 		return
 	}
 	response := a.userUseCase.CreateUser(ctx, request)
@@ -100,7 +100,7 @@ func (a *UserController) Update(ctx *gin.Context) {
 	err := ctx.ShouldBindJSON(&request)
 	if err != nil {
 		a.log.Info("error binding request", zap.Error(err))
-		util.SendErrorResponse(ctx, http.StatusBadRequest, "error binding request")
+		util.SendErrorResponse(ctx, http.StatusBadRequest, "error binding request", err)
 		return
 	}
 
