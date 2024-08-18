@@ -12,3 +12,9 @@ type Model struct {
 	UpdatedAt time.Time
 	DeletedAt gorm.DeletedAt
 }
+
+type Base struct {
+	CreatedBy int
+	UpdatedBy int `gorm:"default:NULL"`
+	DeletedBy int `gorm:"default:NULL"`
+}

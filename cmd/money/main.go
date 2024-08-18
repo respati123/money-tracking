@@ -1,38 +1,59 @@
 package main
 
 import (
-	"fmt"
-	"log"
+	"time"
 
-	"github.com/respati123/money-tracking/configs"
+	"github.com/gin-contrib/cors"
+	"github.com/respati123/money-tracking/docs"
 	_ "github.com/respati123/money-tracking/docs"
-	"github.com/respati123/money-tracking/internal/database"
+	"github.com/respati123/money-tracking/internal/configs"
+	"github.com/respati123/money-tracking/internal/configs/logger"
 )
 
 // @title My API
 // @version 1.0
-// @description This is a sample server.
+// @description Money Tracking Service.
 // @termsOfService http://swagger.io/terms/
 // @contact.name API Support
 // @contact.email support@swagger.io
-// @license.name Apache 2.0
-// @license.url http://www.apache.org/licenses/LICENSE-2.0.html
 // @host localhost:8080
 // @BasePath /api/v1
+// @schemes http https
+// @produce application/json
+// @consumes application/json
+
+//	@securityDefinitions.apikey	ApiKeyAuth
+//	@in							header
+//	@name						Authorization
+//	@description				Description for what is this security definition being used
+
 func main() {
 
-	config, err := configs.InitConfig(".")
+	config, viper := configs.InitConfig()
+	log := logger.NewLogger(viper)
+	db := configs.Database(config, log)
+	redis := configs.NewRedis(viper, log)
+	app := configs.NewGin(viper)
 
-	if err != nil {
-		defer log.Fatal("env not found", err.Error())
-	}
+	// setup swagger
+	docs.SwaggerInfo.Host = "localhost:8080"
+	docs.SwaggerInfo.Schemes = []string{"http", "https"}
 
-	dbReal, dbTest, err := configs.Database(config)
-	database.NewMigration(dbReal, dbTest)
-
-	if err != nil {
-		defer fmt.Printf("error database %s", err.Error())
-	}
-
-	configs.RunServer(config, *dbReal)
+	// setup cors
+	app.Use(cors.New(cors.Config{
+		AllowOrigins:     []string{"*"},
+		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE"},
+		AllowHeaders:     []string{"Origin", "Content-Type", "Authorization"},
+		AllowCredentials: true,
+		MaxAge:           12 * time.Hour,
+	}))
+	configs.Bootstrap(&configs.BootstrapConfig{
+		DB:     db,
+		Log:    log,
+		Viper:  viper,
+		App:    app,
+		Config: config,
+		Redis:  redis,
+	})
+	app.Run(":" + viper.GetString("PORT_SERVER"))
 }

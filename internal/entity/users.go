@@ -1,10 +1,16 @@
 package entity
 
-import "gorm.io/gorm"
+import (
+	"github.com/google/uuid"
+	"gorm.io/gorm"
+)
 
 type User struct {
 	gorm.Model
-	Name        string
-	Age         string
-	Description string
+	UUID        uuid.UUID
+	UserCode    int
+	Email       string
+	Password    string
+	PhoneNumber string
+	Base
 }
