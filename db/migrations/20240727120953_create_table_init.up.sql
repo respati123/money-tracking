@@ -43,6 +43,7 @@ CREATE TABLE "category_type" (
   "uuid" UUID NOT NULL DEFAULT uuid_generate_v4(),
   "transaction_type_code" integer UNIQUE NOT NULL,
   "name" varchar(50) UNIQUE NOT NULL,
+  "alias" varchar(50) UNIQUE NOT NULL,
   "created_at" timestamp NOT NULL,
   "created_by" varchar(100),
   "updated_at" timestamp,

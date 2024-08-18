@@ -8,10 +8,11 @@ import (
 )
 
 type RouteConfig struct {
-	App            *gin.Engine
-	UserController *http.UserController
-	AuthController *http.AuthController
-	RoleController *http.RoleController
+	App                *gin.Engine
+	UserController     *http.UserController
+	AuthController     *http.AuthController
+	RoleController     *http.RoleController
+	CategoryController *http.CategoryController
 
 	// middleware
 	TraceIdMiddleware  gin.HandlerFunc
@@ -41,11 +42,13 @@ func (c *RouteConfig) SetupPrivateRoute() {
 	protected.Use(c.AuthMiddleware)
 
 	users := protected.Group("/api/v1/users")
-	users.POST("/list", c.UserController.GetListUser)
-	users.POST("/", c.UserController.CreateUser)
-	users.DELETE("/:uuid", c.UserController.Delete)
-	users.PUT("/:uuid", c.UserController.Update)
-	users.GET("/:user_code", c.UserController.GetUser)
+	{
+		users.POST("/list", c.UserController.GetListUser)
+		users.POST("/", c.UserController.CreateUser)
+		users.DELETE("/:uuid", c.UserController.Delete)
+		users.PUT("/:uuid", c.UserController.Update)
+		users.GET("/:user_code", c.UserController.GetUser)
+	}
 
 	roles := protected.Group("/api/v1/roles")
 	{
@@ -55,4 +58,14 @@ func (c *RouteConfig) SetupPrivateRoute() {
 		roles.GET("/:role_code", c.RoleController.GetRole)
 		roles.POST("/all", c.RoleController.FindAll)
 	}
+
+	category := protected.Group("/api/v1/category")
+	{
+		category.POST("/", c.CategoryController.Create)
+		category.POST("/all", c.CategoryController.FindAll)
+		category.PUT("/:uuid", c.CategoryController.Update)
+		category.DELETE("/:uuid", c.CategoryController.Delete)
+		category.GET("/:category_code", c.CategoryController.Find)
+	}
+
 }
