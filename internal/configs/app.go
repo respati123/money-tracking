@@ -35,16 +35,19 @@ func Bootstrap(config *BootstrapConfig) {
 	userRepository := repository.NewUserRepository(config.Log)
 	authRepository := repository.NewAuthRepository(config.Log)
 	roleRepository := repository.NewRoleRepository(config.Log)
+	categoryRepository := repository.NewCategoryRepository(config.Log)
 
 	// setup service
 	userUseCase := usecase.NewUserUsecase(config.DB, config.Log, converter, userRepository)
 	authUseCase := usecase.NewAuthUsecase(config.DB, config.Log, config.Config, config.Redis, authRepository, userRepository)
 	roleUseCase := usecase.NewRoleUsecase(config.DB, config.Log, converter, roleRepository)
+	categoryUsecase := usecase.NewCategoryUsecase(config.DB, config.Log, converter, categoryRepository)
 
 	// setup controllers
 	userController := http.NewUserController(userUseCase, config.Log)
 	authController := http.NewAuthController(authUseCase, config.Log)
 	roleController := http.NewRoleController(roleUseCase, config.Log)
+	categoryController := http.NewCategoryController(categoryUsecase, config.Log)
 
 	// setup middleware
 	traceIdMiddleware := middleware.NewTraceMiddleware()
@@ -55,9 +58,10 @@ func Bootstrap(config *BootstrapConfig) {
 		App: config.App,
 
 		// controller
-		UserController: userController,
-		AuthController: authController,
-		RoleController: roleController,
+		UserController:     userController,
+		AuthController:     authController,
+		RoleController:     roleController,
+		CategoryController: categoryController,
 		// middleware
 		TraceIdMiddleware:  traceIdMiddleware,
 		ResponseMiddleware: responseMiddleware,

@@ -1,5 +1,44 @@
 basePath: /api/v1
 definitions:
+  model.CategoryCreateRequest:
+    properties:
+      alias:
+        type: string
+      name:
+        type: string
+    type: object
+  model.CategoryResponse:
+    properties:
+      alias:
+        type: string
+      category_code:
+        type: integer
+      created_at:
+        type: string
+      created_by:
+        type: integer
+      deleted_at:
+        type: string
+      deleted_by:
+        type: integer
+      id:
+        type: integer
+      name:
+        type: string
+      updated_at:
+        type: string
+      updated_by:
+        type: integer
+      uuid:
+        type: string
+    type: object
+  model.CategoryUpdateRequest:
+    properties:
+      alias:
+        type: string
+      name:
+        type: string
+    type: object
   model.LoginRequest:
     properties:
       email:
@@ -16,9 +55,9 @@ definitions:
       token:
         type: string
     type: object
-  model.PaginationModel:
+  model.PaginationMetadata:
     properties:
-      current_page:
+      page:
         type: integer
       per_page:
         type: integer
@@ -41,7 +80,7 @@ definitions:
     properties:
       data: {}
       metadata:
-        $ref: '#/definitions/model.PaginationModel'
+        $ref: '#/definitions/model.PaginationMetadata'
     type: object
   model.RegisterRequest:
     properties:
@@ -54,10 +93,49 @@ definitions:
     type: object
   model.Response:
     properties:
+      response_code:
+        type: integer
       response_data: {}
       response_error:
         type: string
       response_message:
+        type: string
+    type: object
+  model.RoleCreateRequest:
+    properties:
+      alias:
+        type: string
+      name:
+        type: string
+    type: object
+  model.RoleResponse:
+    properties:
+      alias:
+        type: string
+      created_at:
+        type: string
+      created_by:
+        type: integer
+      deleted_at:
+        type: string
+      deleted_by:
+        type: integer
+      id:
+        type: integer
+      name:
+        type: string
+      updated_at:
+        type: string
+      updated_by:
+        type: integer
+      uuid:
+        type: string
+    type: object
+  model.RoleUpdateRequest:
+    properties:
+      alias:
+        type: string
+      name:
         type: string
     type: object
   model.UserCreateRequest:
@@ -74,23 +152,21 @@ definitions:
       created_at:
         type: string
       created_by:
-        type: string
+        type: integer
       deleted_at:
         type: string
       deleted_by:
-        type: string
+        type: integer
       email:
         type: string
       id:
         type: integer
-      password:
-        type: string
       phone_number:
         type: string
       updated_at:
         type: string
       updated_by:
-        type: string
+        type: integer
       user_code:
         type: integer
       uuid:
@@ -132,7 +208,7 @@ paths:
               type: object
       summary: Login
       tags:
-      - auth
+      - Auth
   /auth/register:
     post:
       consumes:
@@ -159,8 +235,483 @@ paths:
               type: object
       summary: Register
       tags:
-      - auth
-  /users/create:
+      - Auth
+  /category/:
+    post:
+      consumes:
+      - application/json
+      description: Create Category
+      parameters:
+      - description: create category request
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/model.CategoryCreateRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: successfully find all role
+          schema:
+            allOf:
+            - $ref: '#/definitions/model.Response'
+            - properties:
+                response_data:
+                  type: string
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            allOf:
+            - $ref: '#/definitions/model.Response'
+            - properties:
+                response_data:
+                  type: string
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/model.Response'
+            - properties:
+                response_data:
+                  type: string
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: Create Category
+      tags:
+      - Category
+  /category/{category_code}:
+    get:
+      description: Find Category
+      parameters:
+      - description: category code
+        in: path
+        name: category_code
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: successfully find role
+          schema:
+            allOf:
+            - $ref: '#/definitions/model.Response'
+            - properties:
+                response_data:
+                  $ref: '#/definitions/model.CategoryResponse'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            allOf:
+            - $ref: '#/definitions/model.Response'
+            - properties:
+                response_data:
+                  type: string
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/model.Response'
+            - properties:
+                response_data:
+                  type: string
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: Find Category
+      tags:
+      - Category
+  /category/{uuid}:
+    delete:
+      description: Delete Category
+      parameters:
+      - description: category uuid
+        in: path
+        name: uuid
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: successfully delete role
+          schema:
+            allOf:
+            - $ref: '#/definitions/model.Response'
+            - properties:
+                response_data:
+                  type: string
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            allOf:
+            - $ref: '#/definitions/model.Response'
+            - properties:
+                response_data:
+                  type: string
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/model.Response'
+            - properties:
+                response_data:
+                  type: string
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: Delete Category
+      tags:
+      - Category
+    put:
+      consumes:
+      - application/json
+      description: Update Category
+      parameters:
+      - description: category uuid
+        in: path
+        name: uuid
+        required: true
+        type: string
+      - description: update category request
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/model.CategoryUpdateRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: successfully update role
+          schema:
+            allOf:
+            - $ref: '#/definitions/model.Response'
+            - properties:
+                response_data:
+                  type: string
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            allOf:
+            - $ref: '#/definitions/model.Response'
+            - properties:
+                response_data:
+                  type: string
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/model.Response'
+            - properties:
+                response_data:
+                  type: string
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: Update Category
+      tags:
+      - Category
+  /category/all:
+    post:
+      description: Find All Category
+      parameters:
+      - description: pagination request
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/model.PaginationRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: successfully find all role
+          schema:
+            allOf:
+            - $ref: '#/definitions/model.Response'
+            - properties:
+                response_data:
+                  allOf:
+                  - $ref: '#/definitions/model.PaginationResponse'
+                  - properties:
+                      data:
+                        items:
+                          $ref: '#/definitions/model.CategoryResponse'
+                        type: array
+                    type: object
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            allOf:
+            - $ref: '#/definitions/model.Response'
+            - properties:
+                response_data:
+                  type: string
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/model.Response'
+            - properties:
+                response_data:
+                  type: string
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: Find All Category
+      tags:
+      - Category
+  /roles/:
+    post:
+      consumes:
+      - application/json
+      description: Create Role
+      parameters:
+      - description: Role Create Request
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/model.RoleCreateRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully create role
+          schema:
+            allOf:
+            - $ref: '#/definitions/model.Response'
+            - properties:
+                response_data:
+                  type: string
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            allOf:
+            - $ref: '#/definitions/model.Response'
+            - properties:
+                response_data:
+                  type: string
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/model.Response'
+            - properties:
+                response_data:
+                  type: string
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: Create Role
+      tags:
+      - Role
+  /roles/{role_code}:
+    get:
+      consumes:
+      - application/json
+      description: Get Role
+      parameters:
+      - description: role code
+        in: path
+        name: role_code
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: successfully get role
+          schema:
+            allOf:
+            - $ref: '#/definitions/model.Response'
+            - properties:
+                response_data:
+                  $ref: '#/definitions/model.RoleResponse'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            allOf:
+            - $ref: '#/definitions/model.Response'
+            - properties:
+                response_data:
+                  type: string
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/model.Response'
+            - properties:
+                response_data:
+                  type: string
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: Get Role
+      tags:
+      - Role
+  /roles/{uuid}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete Role
+      parameters:
+      - description: role uuid
+        in: path
+        name: uuid
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: successfully delete role
+          schema:
+            allOf:
+            - $ref: '#/definitions/model.Response'
+            - properties:
+                response_data:
+                  type: string
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            allOf:
+            - $ref: '#/definitions/model.Response'
+            - properties:
+                response_data:
+                  type: string
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/model.Response'
+            - properties:
+                response_data:
+                  type: string
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: Delete Role
+      tags:
+      - Role
+    put:
+      consumes:
+      - application/json
+      description: Update Role
+      parameters:
+      - description: uuid
+        in: path
+        name: uuid
+        required: true
+        type: string
+      - description: Role update request
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/model.RoleUpdateRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: successfully update role
+          schema:
+            allOf:
+            - $ref: '#/definitions/model.Response'
+            - properties:
+                response_data:
+                  type: string
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            allOf:
+            - $ref: '#/definitions/model.Response'
+            - properties:
+                response_data:
+                  type: string
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/model.Response'
+            - properties:
+                response_data:
+                  type: string
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: Update Role
+      tags:
+      - Role
+  /roles/all:
+    post:
+      consumes:
+      - application/json
+      description: Find all Role
+      parameters:
+      - description: pagination request
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/model.PaginationRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: successfully find all role
+          schema:
+            allOf:
+            - $ref: '#/definitions/model.Response'
+            - properties:
+                response_data:
+                  type: string
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            allOf:
+            - $ref: '#/definitions/model.Response'
+            - properties:
+                response_data:
+                  type: string
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/model.Response'
+            - properties:
+                response_data:
+                  type: string
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: Find all Role
+      tags:
+      - Role
+  /users/:
     post:
       description: Create a new user
       parameters:
@@ -185,6 +736,83 @@ paths:
       security:
       - ApiKeyAuth: []
       summary: Create a new user
+      tags:
+      - Users
+  /users/{user_code}:
+    get:
+      description: Get User
+      parameters:
+      - description: user_code user
+        in: path
+        name: user_code
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: success Get user
+          schema:
+            allOf:
+            - $ref: '#/definitions/model.Response'
+            - properties:
+                response_data:
+                  $ref: '#/definitions/model.UserResponse'
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: Get User
+      tags:
+      - Users
+  /users/{uuid}:
+    delete:
+      description: Delete a new user
+      parameters:
+      - description: uuid user
+        in: path
+        name: uuid
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: success delete user
+          schema:
+            allOf:
+            - $ref: '#/definitions/model.Response'
+            - properties:
+                response_data:
+                  type: string
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: Delete user
+      tags:
+      - Users
+    put:
+      description: Update User
+      parameters:
+      - description: uuid user
+        in: path
+        name: uuid
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: success update user
+          schema:
+            allOf:
+            - $ref: '#/definitions/model.Response'
+            - properties:
+                response_data:
+                  type: string
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: Update User
       tags:
       - Users
   /users/list:

@@ -23,6 +23,7 @@ var (
 	ErrEmailAlreadyExist          = errors.New("email_already_exists")
 	ErrWrongPassword              = errors.New("wrong_password")
 	ErrInvalidUsernameAndPassword = errors.New("invalid_username_and_password")
+	ErrInternalServerError        = errors.New("internal_server_error")
 
 	// // Response Message
 
