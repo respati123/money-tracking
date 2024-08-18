@@ -1,8 +1,6 @@
 package converter
 
 import (
-	"time"
-
 	"github.com/respati123/money-tracking/internal/entity"
 	"github.com/respati123/money-tracking/internal/model"
 )
@@ -20,9 +18,9 @@ func (nr *RoleConverter) ToRoleResponse(role *entity.Role) *model.RoleResponse {
 		UUID:      role.UUID,
 		Name:      role.Name,
 		Alias:     role.Alias,
-		CreatedAt: role.CreatedAt.Format(time.RFC3339),
-		UpdatedAt: role.UpdatedAt.Format(time.RFC3339),
-		DeletedAt: role.DeletedAt.Time.Format(time.RFC3339),
+		CreatedAt: role.CreatedAt,
+		UpdatedAt: role.UpdatedAt,
+		DeletedAt: &role.DeletedAt.Time,
 		CreatedBy: role.CreatedBy,
 		UpdatedBy: role.UpdatedBy,
 		DeletedBy: role.DeletedBy,
