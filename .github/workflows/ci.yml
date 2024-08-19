@@ -9,11 +9,16 @@ on:
   pull_request:
     branches: [ "main" ]
 
-jobs:
 
+jobs:
   build:
     runs-on: self-hosted
     name: respati-vps
+
+    env:
+      GOPATH: ${{ github.workspace }}/go
+
+
     steps:
     - uses: actions/checkout@v4
 
