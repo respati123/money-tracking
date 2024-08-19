@@ -17,7 +17,7 @@
 
 # CMD [ "../main" ]
 
-FROM golang:1.20 AS builder
+FROM golang:1.22 AS builder
 
 WORKDIR /app
 
