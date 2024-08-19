@@ -46,7 +46,7 @@ jobs:
     # # - name: Test
     # #   run: go test -v ./...
     - name: Build binary
-      run: go build -o myapp .
+      run: go build -o myapp ./cmd/money/main.go
 
     - name: Build Docker image
       run: docker build -t my-golang-app:latest .
