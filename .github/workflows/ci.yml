@@ -17,6 +17,7 @@ jobs:
 
     env:
       GOPATH: ${{ github.workspace }}/go
+      GOCACHE: ${{ github.workspace }}/.cache/go-build
 
 
     steps:
