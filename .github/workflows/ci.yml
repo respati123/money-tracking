@@ -63,7 +63,7 @@ jobs:
     
     - name: Deploy to Server
       run: |
-        ssh root@156.67.214.153 "docker pull mydockerhubuser/my-golang-app:latest && \
-                                docker stop my-golang-app || true && \
-                                docker rm my-golang-app || true && \
-                                docker run -d --name my-golang-app -p 8080:8080 mydockerhubuser/my-golang-app:latest"
+        ssh root@156.67.214.153 "docker pull respatitri12/myapp:latest && \
+                                docker stop myapp || true && \
+                                docker rm myapp || true && \
+                                docker run -d --name myapp -p 8080:8080 respatitri12/myapp:latest"
