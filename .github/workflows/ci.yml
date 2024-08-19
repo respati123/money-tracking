@@ -12,7 +12,7 @@ on:
 jobs:
 
   build:
-    runs-on: respati-vps
+    runs-on: respati-vps:self-hosted
     steps:
     - uses: actions/checkout@v4
 
