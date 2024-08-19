@@ -18,7 +18,7 @@ jobs:
     env:
       GOPATH: ${{ github.workspace }}/go
       GOCACHE: ${{ github.workspace }}/.cache/go-build
-      SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+     
 
 
     steps:
@@ -67,3 +67,5 @@ jobs:
                                 docker stop myapp || true && \
                                 docker rm myapp || true && \
                                 docker run -d --name myapp -p 8080:8080 respatitri12/myapp:latest"
+      env:
+        SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
