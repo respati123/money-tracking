@@ -60,6 +60,10 @@ jobs:
 
     - name: Push Docker image to Docker Hub
       run: docker push respatitri12/myapp:latest
+
+    - name: Add server to known_hosts
+      run: |
+        ssh-keyscan -H 156.67.214.153 >> ~/.ssh/known_hosts
     
     - name: Deploy to Server
       run: |
