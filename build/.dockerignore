@@ -2,6 +2,6 @@
 
 # Exclude folder atau file yang tidak diperlukan
 ../deployments/
-../build/
+# ../build/
 ../.git/
 ../*.md

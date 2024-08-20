@@ -31,7 +31,7 @@ RUN go build -o main ./cmd/money/main.go
 
 COPY . .
 
-RUN ls -la
+RUN echo "Running ls -la in /app" && ls -la
 
 FROM alpine:latest
 
@@ -40,7 +40,7 @@ WORKDIR /app
 COPY --from=builder /app/main .
 COPY --from=builder /app/.env .
 
-RUN ls -la
+RUN echo ls -la
 
 
 EXPOSE 8080
