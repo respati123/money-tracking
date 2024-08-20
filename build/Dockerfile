@@ -29,6 +29,8 @@ COPY .. ./
 
 RUN go build -o main ./cmd/money/main.go
 
+COPY . .
+
 FROM alpine:latest
 
 WORKDIR /app
