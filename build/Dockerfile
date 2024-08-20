@@ -25,13 +25,11 @@ COPY go.mod go.sum ./
 
 RUN go mod download
 
-COPY .. ./
+COPY .. .
 
 RUN go build -o main ./cmd/money/main.go
 
 COPY . .
-
-COPY ../.env .
 
 RUN echo "Running ls -la in /app" && ls -la
 

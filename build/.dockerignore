@@ -1,7 +1,7 @@
 # .dockerignore
 
 # Exclude folder atau file yang tidak diperlukan
-../deployments/
+# ../deployments/
 # ../build/
-../.git/
-../*.md
+# ../.git/
+# ../*.md
