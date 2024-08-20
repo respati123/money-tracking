@@ -66,10 +66,9 @@ jobs:
       run: |
         ssh-keyscan -H 156.67.214.153 >> ~/.ssh/known_hosts
     
-    - name: Deploy to Server
+    - name: Deploy to Server 
       run: |
-        ssh root@156.67.214.153 "docker pull respatitri12/myapp:latest && \
-                                docker stop myapp || true && \
-                                docker rm myapp || true && \
-                                docker run -d --name myapp -p 8080:8080 respatitri12/myapp:latest"
+          docker stop myapp-prod || true && \
+          docker rm myapp-prod || true && \
+          docker run -d --name myapp-prod -p 8080:8080 myapp:latest"
         

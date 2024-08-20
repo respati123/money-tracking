@@ -31,10 +31,11 @@ RUN go build -o main ./cmd/money/main.go
 
 FROM alpine:latest
 
-WORKDIR /root/
+WORKDIR /app
 
 COPY --from=builder /app/main .
+COPY --from=builder /app/.env .
 
 EXPOSE 8080
 
-CMD ["../main"]
+ENTRYPOINT [ "/app/main" ]
