@@ -31,6 +31,9 @@ RUN go build -o main ./cmd/money/main.go
 
 COPY . .
 
+
+RUN ls -la
+
 FROM alpine:latest
 
 WORKDIR /app
