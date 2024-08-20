@@ -19,8 +19,6 @@ jobs:
       GOPATH: ${{ github.workspace }}/go
       GOCACHE: ${{ github.workspace }}/.cache/go-build
       SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-     
-
 
     steps:
     - uses: actions/checkout@v4
@@ -38,6 +36,8 @@ jobs:
         key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
         restore-keys: |
           ${{ runner.os }}-go-
+    - name: Set environment variables
+      run: echo "${{ secrets.ENV }}" >> .env
 
     - name: Install dependencies
       run: go mod download

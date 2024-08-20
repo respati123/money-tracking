@@ -12,6 +12,7 @@ func InitConfig() (config util.Config, cfg *viper.Viper) {
 	cfg.SetConfigType("env")
 	cfg.AddConfigPath(".")
 	cfg.SetConfigName(".env")
+	cfg.AutomaticEnv()
 	err := cfg.ReadInConfig()
 
 	if err != nil {

@@ -29,8 +29,6 @@ COPY .. .
 
 RUN go build -o main ./cmd/money/main.go
 
-COPY ../.env .
-
 RUN echo "Running ls -la in /app" && ls -la
 
 FROM alpine:latest
