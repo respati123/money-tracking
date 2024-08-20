@@ -27,7 +27,7 @@ RUN go mod download
 
 COPY .. .
 
-RUN go build -o main ./cmd/money/main.go
+RUN CGO_ENABLED=0 GOOS=linux go build -o main ./cmd/money/main.go
 
 RUN echo "Running ls -la in /app" && ls -la
 
@@ -38,9 +38,6 @@ WORKDIR /app
 COPY --from=builder /app/main .
 COPY --from=builder /app/.env .
 
-RUN echo ls -la
-
-
 EXPOSE 8080
 
-ENTRYPOINT [ "/app/main" ]
+ENTRYPOINT ["/app/main"]
