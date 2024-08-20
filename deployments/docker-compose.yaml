@@ -27,11 +27,10 @@ services:
     restart: always
     
   api:
-    command: bash -c "cp env/.env.development app.env"
     container_name: api
     build: 
       context: ../build
-      dockerfile: dev.Dockerfile
+      dockerfile: Dockerfile
     depends_on:
       - db
     networks:
