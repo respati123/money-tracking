@@ -70,5 +70,5 @@ jobs:
       run: |
           docker stop myapp-prod || true && \
           docker rm myapp-prod || true && \
-          docker run -d --name myapp-prod -p 8080:8080 myapp:latest"
+          docker run -d --name myapp-prod -p 8080:8080 myapp:latest
         
