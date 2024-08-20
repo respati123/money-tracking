@@ -31,7 +31,6 @@ RUN go build -o main ./cmd/money/main.go
 
 COPY . .
 
-
 RUN ls -la
 
 FROM alpine:latest
@@ -39,7 +38,7 @@ FROM alpine:latest
 WORKDIR /app
 
 COPY --from=builder /app/main .
-COPY --from=builder /app/.env .
+COPY --from=builder /app/env .
 
 EXPOSE 8080
 
