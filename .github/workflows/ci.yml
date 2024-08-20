@@ -62,13 +62,11 @@ jobs:
     - name: Push Docker image to Docker Hub
       run: docker push respatitri12/myapp:latest
 
-    - name: Add server to known_hosts
-      run: |
-        ssh-keyscan -H 156.67.214.153 >> ~/.ssh/known_hosts
+
+    - name: Install Docker Compose
+      run: sudo apt-get install docker-compose
     
     - name: Deploy to Server 
       run: |
-          docker stop myapp-prod || true && \
-          docker rm myapp-prod || true && \
-          docker run -d --name myapp-prod -p 8080:8080 myapp:latest
+          docker-compose -f deployments/docker-compose.yaml up -d
         
