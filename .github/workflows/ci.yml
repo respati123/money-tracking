@@ -64,7 +64,7 @@ jobs:
 
 
     - name: Install Docker Compose
-      run: sudo apt-get install docker-compose
+      run: sudo apt-get install docker-compose -y
     
     - name: Deploy to Server 
       run: |
