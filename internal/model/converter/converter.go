@@ -4,6 +4,7 @@ type Converter struct {
 	*RoleConverter
 	*UserConverter
 	*CategoryConverter
+	*TransactionConverter
 }
 
 func NewConverter() *Converter {
@@ -11,5 +12,6 @@ func NewConverter() *Converter {
 		NewRoleConverter(),
 		NewUserConverter(),
 		NewCategoryConverter(),
+		NewTransactionConverter(),
 	}
 }
