@@ -1,23 +1,64 @@
 version: '3.5'
 
 services:
+  redisinsight:
+    container_name: redisinsight
+    image: redislabs/redisinsight:latest
+    ports:
+      - "5540:5540"
+    restart: always
+    networks:
+      - db_postgresql
+    env_file:
+      - ../.env
+    volumes:
+      - redisinsight:/data
+  redis: 
+    container_name: dragonfly
+    image: docker.dragonflydb.io/dragonflydb/dragonfly
+    networks:
+      - db_postgresql
+    ports:
+      - "6379:6379"
+    env_file:
+      - ../.env
+    volumes:
+      - db_redis:/data
+    restart: always
+    
+  api:
+    container_name: api
+    build: 
+      context: ../build
+      dockerfile: Dockerfile
+    depends_on:
+      - db
+    networks:
+      - db_postgresql
+    restart: always
+    env_file:
+      - ../.env
+    volumes:
+      - ../:/app
+    ports:
+      - "${PORT_SERVER}:${PORT_SERVER}"
   db:
     container_name: db_postgresql
-    image: postgres:alpine
+    image: postgres:16.3
     ports:
-      - '5434:5432'
-    environment:
-      - POSTGRES_USER: money 
-      - POSTGRES_PASSWORD: money 
-      - POSTGRES_DB: money_tracking
+      - 5434:5432
+    restart: always
+    env_file:
+      - ../.env
     networks:
       - db_postgresql
     volumes:
       - db_postgresql:/var/lib/postgresql/data
-
+      - ../initdb:/docker-entrypoint-initdb.d
 volumes:
   db_postgresql:
-
+  db_redis:
+  redisinsight:
 networks:
   db_postgresql:
     driver: bridge
