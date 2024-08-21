@@ -25,7 +25,7 @@ func (cc *CategoryConverter) ToCategoryResponse(category entity.Category) model.
 		UUID:         category.UUID,
 		Alias:        category.Alias,
 		Name:         category.Name,
-		CategoryCode: category.CategoryCode,
+		CategoryCode: category.CategoryTypeCode,
 		CreatedAt:    category.CreatedAt.Format(time.RFC3339),
 		CreatedBy:    category.CreatedBy,
 		UpdatedAt:    category.UpdatedAt.Format(time.RFC3339),

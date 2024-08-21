@@ -8,11 +8,12 @@ import (
 )
 
 type RouteConfig struct {
-	App                *gin.Engine
-	UserController     *http.UserController
-	AuthController     *http.AuthController
-	RoleController     *http.RoleController
-	CategoryController *http.CategoryController
+	App                   *gin.Engine
+	UserController        *http.UserController
+	AuthController        *http.AuthController
+	RoleController        *http.RoleController
+	CategoryController    *http.CategoryController
+	TransactionController *http.TransactionController
 
 	// middleware
 	TraceIdMiddleware  gin.HandlerFunc
@@ -66,6 +67,15 @@ func (c *RouteConfig) SetupPrivateRoute() {
 		category.PUT("/:uuid", c.CategoryController.Update)
 		category.DELETE("/:uuid", c.CategoryController.Delete)
 		category.GET("/:category_code", c.CategoryController.Find)
+	}
+
+	transaction := protected.Group("/api/v1/transaction")
+	{
+		transaction.GET("/:transaction_code", c.TransactionController.GetTransaction)
+		transaction.POST("/", c.TransactionController.CreateTransaction)
+		transaction.PUT("/:uuid", c.TransactionController.UpdateTransaction)
+		transaction.POST("/all", c.TransactionController.FindAll)
+
 	}
 
 }
