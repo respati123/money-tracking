@@ -37,11 +37,12 @@ func (cu *CategoryUseCase) Create(ctx *gin.Context, request model.CategoryCreate
 	defer func() {
 		if r := recover(); r != nil {
 			tx.Rollback()
+			return
 		}
 	}()
 
 	var category = new(entity.Category)
-	category.CategoryCode = util.GenerateNumber(4)
+	category.CategoryTypeCode = util.GenerateNumber(4)
 	category.Alias = request.Alias
 	category.Name = request.Name
 
@@ -227,7 +228,7 @@ func (cu *CategoryUseCase) GetCategory(ctx *gin.Context, id int) model.ResponseI
 	tx := cu.db.WithContext(ctx)
 	var category entity.Category
 
-	_, err := cu.categoryRepo.FindByCode(tx, &category, "category_code", id)
+	_, err := cu.categoryRepo.FindByCode(tx, &category, "transaction_type_code", id)
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
 			cu.log.Error("Error while not found", zap.Error(err))

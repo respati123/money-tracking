@@ -36,18 +36,21 @@ func Bootstrap(config *BootstrapConfig) {
 	authRepository := repository.NewAuthRepository(config.Log)
 	roleRepository := repository.NewRoleRepository(config.Log)
 	categoryRepository := repository.NewCategoryRepository(config.Log)
+	transactionRepository := repository.NewTransactionRepository(config.Log)
 
 	// setup service
 	userUseCase := usecase.NewUserUsecase(config.DB, config.Log, converter, userRepository)
 	authUseCase := usecase.NewAuthUsecase(config.DB, config.Log, config.Config, config.Redis, authRepository, userRepository)
 	roleUseCase := usecase.NewRoleUsecase(config.DB, config.Log, converter, roleRepository)
 	categoryUsecase := usecase.NewCategoryUsecase(config.DB, config.Log, converter, categoryRepository)
+	transactionUsecase := usecase.NewTransactionUsecase(config.DB, config.Log, converter, transactionRepository)
 
 	// setup controllers
 	userController := http.NewUserController(userUseCase, config.Log)
 	authController := http.NewAuthController(authUseCase, config.Log)
 	roleController := http.NewRoleController(roleUseCase, config.Log)
 	categoryController := http.NewCategoryController(categoryUsecase, config.Log)
+	transactionController := http.NewTransactionController(transactionUsecase, config.Log)
 
 	// setup middleware
 	traceIdMiddleware := middleware.NewTraceMiddleware()
@@ -58,10 +61,12 @@ func Bootstrap(config *BootstrapConfig) {
 		App: config.App,
 
 		// controller
-		UserController:     userController,
-		AuthController:     authController,
-		RoleController:     roleController,
-		CategoryController: categoryController,
+		UserController:        userController,
+		AuthController:        authController,
+		RoleController:        roleController,
+		CategoryController:    categoryController,
+		TransactionController: transactionController,
+
 		// middleware
 		TraceIdMiddleware:  traceIdMiddleware,
 		ResponseMiddleware: responseMiddleware,
