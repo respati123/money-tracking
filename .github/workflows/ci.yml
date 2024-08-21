@@ -39,6 +39,9 @@ jobs:
     - name: Set environment variables
       run: echo "${{ secrets.ENV }}" >> .env
 
+    - name: ENV
+      run: cat .env
+
     - name: Install dependencies
       run: go mod download
 
