@@ -50,23 +50,24 @@ jobs:
     # - name: Build binary
     #   run: go build -o myapp ./cmd/money/main.go
 
-    # - name: Build Docker image
-    #   run: docker build -t myapp:latest -f ./build/Dockerfile .
+    - name: Build Docker image
+      run: docker build -t myapp:latest -f ./build/Dockerfile .
 
-    # - name: Log in to Docker Hub
-    #   run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
+    - name: Log in to Docker Hub
+      run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
 
-    # - name: Tag Docker image
-    #   run: docker tag myapp:latest respatitri12/myapp:latest
+    - name: Tag Docker image
+      run: docker tag myapp:latest respatitri12/myapp:latest
 
-    # - name: Push Docker image to Docker Hub
-    #   run: docker push respatitri12/myapp:latest
+    - name: Push Docker image to Docker Hub
+      run: docker push respatitri12/myapp:latest
 
 
-    - name: Install Docker Compose
-      run: sudo apt-get install docker-compose -y
+    # - name: Install Docker Compose
+    #   run: sudo apt-get install docker-compose -y
     
     - name: Deploy to Server 
       run: |
-          docker-compose -f deployments/docker-compose.yaml up -d
-        
+          docker stop myapp:latest || true \
+          docker rm myapp:latest || true \
+          docker run -d -p 8080:8080 --name myapp_prod myapp:latest
