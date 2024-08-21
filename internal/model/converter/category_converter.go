@@ -1,8 +1,6 @@
 package converter
 
 import (
-	"time"
-
 	"github.com/respati123/money-tracking/internal/entity"
 	"github.com/respati123/money-tracking/internal/model"
 )
@@ -15,22 +13,17 @@ func NewCategoryConverter() *CategoryConverter {
 
 func (cc *CategoryConverter) ToCategoryResponse(category entity.Category) model.CategoryResponse {
 
-	deletedAt := ""
-	if category.DeletedAt.Valid {
-		deletedAt = category.DeletedAt.Time.Format(time.RFC3339)
-	}
-
 	return model.CategoryResponse{
 		ID:           category.ID,
 		UUID:         category.UUID,
 		Alias:        category.Alias,
 		Name:         category.Name,
 		CategoryCode: category.CategoryTypeCode,
-		CreatedAt:    category.CreatedAt.Format(time.RFC3339),
+		CreatedAt:    category.CreatedAt,
 		CreatedBy:    category.CreatedBy,
-		UpdatedAt:    category.UpdatedAt.Format(time.RFC3339),
+		UpdatedAt:    category.UpdatedAt,
 		UpdatedBy:    category.UpdatedBy,
-		DeletedAt:    deletedAt,
+		DeletedAt:    &category.DeletedAt.Time,
 		DeletedBy:    category.DeletedBy,
 	}
 }

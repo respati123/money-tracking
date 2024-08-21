@@ -14,11 +14,12 @@ CREATE TABLE public."users" (
   "phone_number" varchar(20) UNIQUE NOT NULL,
   "is_active" boolean DEFAULT false,
   "created_at" timestamp,
-  "created_by" integer,
+  "created_by" int null,
   "updated_at" timestamp,
-  "updated_by" integer,
+  "updated_by" int null,
   "deleted_at" timestamp,
-  "deleted_by" integer
+  "deleted_by" int null
+
 );
 
 CREATE TABLE "user_profile" (
@@ -31,11 +32,11 @@ CREATE TABLE "user_profile" (
   "photo" text,
   "address" text,
   "created_at" timestamp NOT NULL,
-  "created_by" integer,
+  "created_by" int null,
   "updated_at" timestamp,
-  "updated_by" integer,
+  "updated_by" int null,
   "deleted_at" timestamp,
-  "deleted_by" integer
+  "deleted_by" int null
 );
 
 CREATE TABLE "category_type" (
@@ -45,11 +46,11 @@ CREATE TABLE "category_type" (
   "name" varchar(50) UNIQUE NOT NULL,
   "alias" varchar(50) UNIQUE NOT NULL,
   "created_at" timestamp NOT NULL,
-  "created_by" integer,
+  "created_by" int null,
   "updated_at" timestamp,
-  "updated_by" integer,
+  "updated_by" int null,
   "deleted_at" timestamp,
-  "deleted_by" integer
+  "deleted_by" int null
 );
 
 CREATE TABLE "transaction" (
@@ -63,11 +64,11 @@ CREATE TABLE "transaction" (
   "title" varchar(255),
   "amount" numeric(20,2),
   "created_at" timestamp NOT NULL,
-  "created_by" integer,
+  "created_by" int null,
   "updated_at" timestamp,
-  "updated_by" integer,
+  "updated_by" int null,
   "deleted_at" timestamp,
-  "deleted_by" integer
+  "deleted_by" int null
 );
 
 CREATE TABLE "otp" (
