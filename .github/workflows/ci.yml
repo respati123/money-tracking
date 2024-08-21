@@ -12,7 +12,9 @@ on:
 jobs:
 
   build:
-    runs-on: ubuntu-latest
+    environment: staging
+    runs-on: self-hosted
+    name: respati-vps
     steps:
     - uses: actions/checkout@v4
 
@@ -20,9 +22,20 @@ jobs:
       uses: actions/setup-go@v4
       with:
         go-version: '1.22.3'
+    
+    - name: Set Environtment variables
+      run: echo {{ secrets.DBURL }} >> .env
 
     - name: Build
-      run: go build -v ./...
-
-    - name: Test
-      run: go test -v ./...
+      run: docker build -t myapp-prod -f ./build/Dockerfile .
+  
+  deploy:
+    environment: staging
+    runs-on: self-hosted
+    name: respati-vps
+    steps:
+      - name: Docker run myapp-prod
+        run: | 
+          docker stop myapp-prod || true
+          docker rm myapp-prod || true
+          docker run -d --name myapp-prod -p 8080:8080 myapp-prod:latest
