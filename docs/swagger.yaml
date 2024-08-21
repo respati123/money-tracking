@@ -138,6 +138,61 @@ definitions:
       name:
         type: string
     type: object
+  model.TransactionRequest:
+    properties:
+      amount:
+        type: number
+      category_type_code:
+        type: integer
+      description:
+        type: string
+      title:
+        type: string
+      transaction_type:
+        type: string
+    type: object
+  model.TransactionResponse:
+    properties:
+      amount:
+        type: number
+      category_type_code:
+        type: integer
+      created_at:
+        type: string
+      created_by:
+        type: integer
+      deleted_at:
+        type: string
+      deleted_by:
+        type: integer
+      description:
+        type: string
+      id:
+        type: integer
+      title:
+        type: string
+      transaction_code:
+        type: integer
+      updated_at:
+        type: string
+      updated_by:
+        type: integer
+      uuid:
+        type: string
+    type: object
+  model.TransactionUpdateRequest:
+    properties:
+      amount:
+        type: number
+      category_type_code:
+        type: integer
+      description:
+        type: string
+      title:
+        type: string
+      transaction_type:
+        type: string
+    type: object
   model.UserCreateRequest:
     properties:
       email:
@@ -711,6 +766,205 @@ paths:
       summary: Find all Role
       tags:
       - Role
+  /transaction:
+    post:
+      consumes:
+      - application/json
+      description: Create Transaction
+      parameters:
+      - description: Transaction Body
+        in: body
+        name: transaction
+        required: true
+        schema:
+          $ref: '#/definitions/model.TransactionRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully create transaction
+          schema:
+            allOf:
+            - $ref: '#/definitions/model.Response'
+            - properties:
+                response_data:
+                  type: string
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            allOf:
+            - $ref: '#/definitions/model.Response'
+            - properties:
+                response_data:
+                  type: string
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/model.Response'
+            - properties:
+                response_data:
+                  type: string
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: Create Transaction
+      tags:
+      - Transaction
+  /transaction/{transaction_code}:
+    get:
+      consumes:
+      - application/json
+      description: Get Transaction
+      parameters:
+      - description: Transaction Code
+        in: path
+        name: transaction_code
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully get transaction
+          schema:
+            allOf:
+            - $ref: '#/definitions/model.Response'
+            - properties:
+                response_data:
+                  $ref: '#/definitions/model.TransactionResponse'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            allOf:
+            - $ref: '#/definitions/model.Response'
+            - properties:
+                response_data:
+                  type: string
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/model.Response'
+            - properties:
+                response_data:
+                  type: string
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: Get Transaction
+      tags:
+      - Transaction
+  /transaction/{uuid}:
+    put:
+      consumes:
+      - application/json
+      description: Update Transaction
+      parameters:
+      - description: uuid
+        in: path
+        name: uuid
+        required: true
+        type: string
+      - description: Transaction Body
+        in: body
+        name: transaction
+        required: true
+        schema:
+          $ref: '#/definitions/model.TransactionUpdateRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully update transaction
+          schema:
+            allOf:
+            - $ref: '#/definitions/model.Response'
+            - properties:
+                response_data:
+                  type: string
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            allOf:
+            - $ref: '#/definitions/model.Response'
+            - properties:
+                response_data:
+                  type: string
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/model.Response'
+            - properties:
+                response_data:
+                  type: string
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: Update Transaction
+      tags:
+      - Transaction
+  /transaction/all:
+    post:
+      consumes:
+      - application/json
+      description: Find All Transaction
+      parameters:
+      - description: Pagination Request
+        in: body
+        name: pagination
+        required: true
+        schema:
+          $ref: '#/definitions/model.PaginationRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully find all transaction
+          schema:
+            allOf:
+            - $ref: '#/definitions/model.Response'
+            - properties:
+                response_data:
+                  allOf:
+                  - $ref: '#/definitions/model.PaginationResponse'
+                  - properties:
+                      data:
+                        items:
+                          $ref: '#/definitions/model.TransactionResponse'
+                        type: array
+                    type: object
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            allOf:
+            - $ref: '#/definitions/model.Response'
+            - properties:
+                response_data:
+                  type: string
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/model.Response'
+            - properties:
+                response_data:
+                  type: string
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: Find All Transaction
+      tags:
+      - Transaction
   /users/:
     post:
       description: Create a new user

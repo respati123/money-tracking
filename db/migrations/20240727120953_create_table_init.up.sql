@@ -14,11 +14,11 @@ CREATE TABLE public."users" (
   "phone_number" varchar(20) UNIQUE NOT NULL,
   "is_active" boolean DEFAULT false,
   "created_at" timestamp,
-  "created_by" varchar(100),
+  "created_by" integer,
   "updated_at" timestamp,
-  "updated_by" varchar(100),
+  "updated_by" integer,
   "deleted_at" timestamp,
-  "deleted_by" varchar(100)
+  "deleted_by" integer
 );
 
 CREATE TABLE "user_profile" (
@@ -31,25 +31,25 @@ CREATE TABLE "user_profile" (
   "photo" text,
   "address" text,
   "created_at" timestamp NOT NULL,
-  "created_by" varchar(100),
+  "created_by" integer,
   "updated_at" timestamp,
-  "updated_by" varchar(100),
+  "updated_by" integer,
   "deleted_at" timestamp,
-  "deleted_by" varchar(100)
+  "deleted_by" integer
 );
 
 CREATE TABLE "category_type" (
   "id" SERIAL PRIMARY KEY,
   "uuid" UUID NOT NULL DEFAULT uuid_generate_v4(),
-  "transaction_type_code" integer UNIQUE NOT NULL,
+  "category_type_code" integer UNIQUE NOT NULL,
   "name" varchar(50) UNIQUE NOT NULL,
   "alias" varchar(50) UNIQUE NOT NULL,
   "created_at" timestamp NOT NULL,
-  "created_by" varchar(100),
+  "created_by" integer,
   "updated_at" timestamp,
-  "updated_by" varchar(100),
+  "updated_by" integer,
   "deleted_at" timestamp,
-  "deleted_by" varchar(100)
+  "deleted_by" integer
 );
 
 CREATE TABLE "transaction" (
@@ -57,16 +57,17 @@ CREATE TABLE "transaction" (
   "uuid" UUID NOT NULL DEFAULT uuid_generate_v4(),
   "user_code" integer NOT NULL,
   "transaction_code" integer UNIQUE NOT NULL,
-  "category_type_code" integer,
+  "category_type_code" integer NOT NULL,
   "transaction_type" typetransaction NOT NULL,
   "description" text,
   "title" varchar(255),
+  "amount" numeric(20,2),
   "created_at" timestamp NOT NULL,
-  "created_by" varchar(100),
+  "created_by" integer,
   "updated_at" timestamp,
-  "updated_by" varchar(100),
+  "updated_by" integer,
   "deleted_at" timestamp,
-  "deleted_by" varchar(100)
+  "deleted_by" integer
 );
 
 CREATE TABLE "otp" (
@@ -89,7 +90,7 @@ CREATE INDEX "user_is_active_index" ON "users" ("is_active");
 CREATE INDEX "user_profile_user_code_index" ON "user_profile" ("user_code");
 
 CREATE INDEX "category_type_uuid_index" ON "category_type" ("uuid");
-CREATE INDEX "category_type_transaction_type_code_index" ON "category_type" ("transaction_type_code");
+CREATE INDEX "category_type_category_type_code_index" ON "category_type" ("category_type_code");
 CREATE INDEX "category_type_name_index" ON "category_type" ("name");
 
 CREATE INDEX "transaction_uuid_index" ON "transaction" ("uuid");
@@ -109,7 +110,7 @@ COMMENT ON COLUMN "category_type"."uuid" IS 'this key for updated, delete method
 COMMENT ON COLUMN "transaction"."uuid" IS 'this key for updated, delete method';
 COMMENT ON COLUMN "transaction"."transaction_code" IS 'this key for get transaction by code';
 
-ALTER TABLE "transaction" ADD FOREIGN KEY ("category_type_code") REFERENCES "category_type" ("transaction_type_code");
+ALTER TABLE "transaction" ADD FOREIGN KEY ("category_type_code") REFERENCES "category_type" ("category_type_code") ON DELETE CASCADE ON UPDATE NO ACTION;
 ALTER TABLE "user_profile" ADD FOREIGN KEY ("user_code") REFERENCES "users" ("user_code") ON DELETE CASCADE ON UPDATE NO ACTION;
 ALTER TABLE "transaction" ADD FOREIGN KEY ("user_code") REFERENCES "users" ("user_code") ON DELETE CASCADE ON UPDATE NO ACTION;
 ALTER TABLE "otp" ADD FOREIGN KEY ("user_code") REFERENCES "users" ("user_code") ON DELETE CASCADE ON UPDATE NO ACTION;

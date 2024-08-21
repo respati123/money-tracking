@@ -2,6 +2,7 @@ package usecase
 
 import (
 	"net/http"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 	"github.com/respati123/money-tracking/internal/constants"
@@ -31,23 +32,31 @@ func NewCategoryUsecase(db *gorm.DB, log *zap.Logger, converter *converter.Conve
 }
 
 func (cu *CategoryUseCase) Create(ctx *gin.Context, request model.CategoryCreateRequest) model.ResponseInterface {
-	tx := cu.db.WithContext(ctx)
+	tx := cu.db.WithContext(ctx).Begin()
 
 	defer func() {
 		if r := recover(); r != nil {
 			tx.Rollback()
+			return
 		}
 	}()
 
 	var category = new(entity.Category)
-	category.CategoryCode = util.GenerateNumber(4)
+	category.CategoryTypeCode = util.GenerateNumber(4)
 	category.Alias = request.Alias
 	category.Name = request.Name
 
-	tx.Begin()
 	err := cu.categoryRepo.Create(tx, category)
 
 	if err != nil {
+		if strings.Contains(err.Error(), constants.DuplicateKey) {
+			cu.log.Error("Error while create category", zap.Any("error", err.Error()))
+			return model.ResponseInterface{
+				Message:    constants.Error,
+				Error:      constants.ErrDuplicate("category"),
+				StatusCode: http.StatusBadRequest,
+			}
+		}
 		cu.log.Error("Error while create category", zap.Any("error", err.Error()))
 		return model.ResponseInterface{
 			Message:    constants.Error,
@@ -73,7 +82,7 @@ func (cu *CategoryUseCase) Create(ctx *gin.Context, request model.CategoryCreate
 }
 
 func (cu *CategoryUseCase) Delete(ctx *gin.Context, id string) model.ResponseInterface {
-	tx := cu.db.WithContext(ctx)
+	tx := cu.db.WithContext(ctx).Begin()
 
 	defer func() {
 		if r := recover(); r != nil {
@@ -101,7 +110,6 @@ func (cu *CategoryUseCase) Delete(ctx *gin.Context, id string) model.ResponseInt
 		}
 	}
 
-	tx.Begin()
 	err = cu.categoryRepo.Delete(tx, category)
 
 	if err != nil {
@@ -131,7 +139,7 @@ func (cu *CategoryUseCase) Delete(ctx *gin.Context, id string) model.ResponseInt
 }
 
 func (cu *CategoryUseCase) Update(ctx *gin.Context, request model.CategoryUpdateRequest, id string) model.ResponseInterface {
-	tx := cu.db.WithContext(ctx)
+	tx := cu.db.WithContext(ctx).Begin()
 
 	defer func() {
 		if r := recover(); r != nil {
@@ -162,7 +170,6 @@ func (cu *CategoryUseCase) Update(ctx *gin.Context, request model.CategoryUpdate
 	category.Alias = request.Alias
 	category.Name = request.Name
 
-	tx.Begin()
 	err = cu.categoryRepo.Update(tx, category)
 
 	if err != nil {
@@ -221,7 +228,7 @@ func (cu *CategoryUseCase) GetCategory(ctx *gin.Context, id int) model.ResponseI
 	tx := cu.db.WithContext(ctx)
 	var category entity.Category
 
-	_, err := cu.categoryRepo.FindByCode(tx, &category, "category_code", id)
+	_, err := cu.categoryRepo.FindByCode(tx, &category, "transaction_type_code", id)
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
 			cu.log.Error("Error while not found", zap.Error(err))
